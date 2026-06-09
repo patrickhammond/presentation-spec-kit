@@ -1,0 +1,1128 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Heebo:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap");
+
+/* ── Reset & globals ─────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Hanging-indent for bullet lists: the gap from the marker to the text.
+     em-based so it scales with each list's own font size. Shared by
+     .sl-bullets (slides) and .detail-pts (flow detail panel). */
+  --bullet-hang: 1.2em;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0e14;
+  color: #cbd5e1;
+  font-family: "Heebo", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Flow canvas ──────────────────────────────────────────────────────────── */
+.flow-root {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.flow-canvas-area {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+/* Light canvas — matches slide warm white */
+.react-flow {
+  background: #fffaf6 !important;
+}
+
+/* ── Step nodes ───────────────────────────────────────────────────────────── */
+.step-node {
+  display: flex;
+  align-items: stretch;
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--tier-color) 35%, #d8d0c8);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s,
+    opacity 0.25s,
+    border-color 0.2s;
+  position: relative;
+  min-height: 72px;
+}
+
+.step-node[data-tier="optional"] {
+  border-style: dashed;
+}
+
+.step-node[data-active] {
+  border-color: var(--tier-color);
+  box-shadow:
+    0 0 0 1px var(--tier-color),
+    0 0 20px color-mix(in srgb, var(--tier-color) 20%, transparent);
+}
+
+.step-node[data-dimmed] {
+  opacity: 0.32;
+}
+
+.step-node-bar {
+  width: 4px;
+  background: var(--tier-color);
+  flex-shrink: 0;
+}
+
+.step-node-body {
+  padding: 12px 14px 12px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+}
+
+.step-node-cmd {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tier-color);
+  letter-spacing: -0.01em;
+}
+
+.step-node-sub {
+  font-size: 11px;
+  color: #606870;
+  line-height: 1.35;
+}
+
+.step-node-tier {
+  position: absolute;
+  bottom: 7px;
+  right: 9px;
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tier-color);
+}
+
+/* Hide React Flow default handle dots */
+.step-handle {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+/* Offset handles — override React Flow's inline left positioning */
+.step-handle--offset-right {
+  left: 72% !important;
+}
+.step-handle--offset-left {
+  left: 28% !important;
+}
+
+/* ── Loop edge ────────────────────────────────────────────────────────────── */
+.loop-edge-path {
+  fill: none;
+  stroke: #b8c4cc;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+/* ── Loop edge label ──────────────────────────────────────────────────────── */
+.loop-label {
+  position: absolute;
+  font-size: 10px;
+  font-family: "Heebo", sans-serif;
+  color: #0d8f82;
+  background: #fffaf6;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, #3fd6c0 45%, #d8d0c8);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ── Detail panel ─────────────────────────────────────────────────────────── */
+.detail-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 33%;
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--tier-color) 30%, #d8d0c8);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.detail-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #9aa0a8;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.detail-close:hover {
+  color: #20282d;
+}
+
+.detail-counter {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  color: #9aa0a8;
+  letter-spacing: 0.05em;
+}
+
+.detail-cmd {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(22px, 2.8vmin, 38px);
+  font-weight: 500;
+  color: var(--tier-color);
+  letter-spacing: -0.01em;
+  overflow-wrap: break-word;
+}
+
+.detail-sub {
+  font-size: clamp(22px, 2.5vmin, 32px);
+  color: #5c6e7d;
+  margin-top: -8px;
+}
+
+.detail-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: clamp(11px, 1.3vmin, 16px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tier-color);
+  border: 1px solid color-mix(in srgb, var(--tier-color) 40%, transparent);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: -6px;
+}
+
+.detail-sum {
+  font-size: clamp(18px, 2.1vmin, 26px);
+  line-height: 1.55;
+  color: #404850;
+  border-top: 1px solid #e0d8d0;
+  padding-top: 14px;
+}
+
+/* Flow detail-panel bullets — shares the bullet-list base in the slides section;
+   only the gap and type scale differ. */
+.detail-pts {
+  gap: 8px;
+}
+
+.detail-pts li {
+  font-size: clamp(18px, 2.1vmin, 26px);
+  line-height: 1.5;
+}
+
+.detail-writes {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border-top: 1px solid #e0d8d0;
+  padding-top: 12px;
+  font-size: clamp(18px, 2.1vmin, 26px);
+}
+
+/* Shared "inline command" treatment: the Writes label/path reuse it so the
+   panel has one source of truth for mono command styling. */
+.detail-inline-cmd,
+.detail-writes-label,
+.detail-writes-path {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9em;
+}
+.detail-inline-cmd {
+  color: #404850;
+}
+.detail-writes-label,
+.detail-writes-path {
+  color: var(--tier-color);
+}
+
+.detail-writes-label {
+  font-weight: 500;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.detail-writes-path {
+  overflow-wrap: break-word;
+}
+
+.detail-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.detail-nav button {
+  flex: 1;
+  background: #f5f0ea;
+  border: 1px solid #d8d0c8;
+  color: #606870;
+  font-family: "Heebo", sans-serif;
+  font-size: 12px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.detail-nav button:hover:not(:disabled) {
+  border-color: var(--tier-color);
+  color: #20282d;
+}
+
+.detail-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ── Nav pills ────────────────────────────────────────────────────────────── */
+.nav-pills {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 12px;
+  border-top: 1px solid #e0d8d0;
+  background: #f5f0ea;
+  flex-shrink: 0;
+}
+
+.nav-pill {
+  width: 32px;
+  height: 28px;
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--tier-color) 30%, #d8d0c8);
+  border-radius: 5px;
+  color: #8a9aaa;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
+  line-height: 1;
+}
+
+.nav-pill[data-active] {
+  background: color-mix(in srgb, var(--tier-color) 12%, #ffffff);
+  border-color: var(--tier-color);
+  color: var(--tier-color);
+}
+
+.nav-pill:hover:not([data-active]) {
+  border-color: color-mix(in srgb, var(--tier-color) 60%, #d8d0c8);
+  color: #404850;
+}
+
+/* Tier dots on pills */
+.nav-pill[data-tier="optional"] {
+  border-style: dashed;
+}
+
+/* ── Key hint ─────────────────────────────────────────────────────────────── */
+.key-hint {
+  position: absolute;
+  bottom: 22px;
+  right: 20px;
+  font-size: 10px;
+  color: #a0a8b0;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Flow back button ─────────────────────────────────────────────────────── */
+.flow-back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #ffffff;
+  border: 1px solid #d8d0c8;
+  color: #606870;
+  font-family: "Heebo", sans-serif;
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 10;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.flow-back-btn:hover {
+  border-color: #a0a8b0;
+  color: #20282d;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* Slide system — light theme, Ingage brand, 16:10 enforced                   */
+/* Warm White #FFFAF6 base · Text Dark #20282D · Orange decorative only       */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+/* Outer shell: warm stone pillarbox */
+.slideshow {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ede6dc;
+}
+
+/* 16:10 stage — Ingage Warm White, dark text baseline */
+.slide-stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  width: min(100%, calc(100vh * 16 / 10));
+  background: #fffaf6;
+  color: #20282d;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ingage logo mark — bottom-left corner of every slide */
+.slide-logo-mark {
+  position: absolute;
+  bottom: 1.8vmin;
+  left: 2vmin;
+  height: clamp(20px, 2.5vmin, 30px);
+  width: auto;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Hero logo on title slide */
+.sl-logo-hero {
+  height: clamp(28px, 3.5vmin, 44px);
+  width: auto;
+  margin-bottom: -0.5vmin;
+}
+
+/* Slide counter — top right */
+.slide-progress {
+  position: absolute;
+  top: 1.5vmin;
+  right: 2vmin;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(10px, 1.1vmin, 13px);
+  color: #606870;
+  letter-spacing: 0.08em;
+  z-index: 10;
+}
+
+/* Animation wrapper — key changes trigger re-mount → re-animation */
+@keyframes sl-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.slide-anim {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sl-enter 0.28s ease-out;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.flow-anim {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: sl-enter 0.28s ease-out;
+}
+
+/* Honor a reduced-motion preference: drop slide/flow entrance animation,
+   the traveling loop-edge dots, and any decorative transitions.
+   Durations collapse to ~0 so end states (full opacity, no offset) still apply. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.flow-label {
+  position: absolute;
+  top: 3.5vmin;
+  left: 4.5vmin;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* Dot navigation — bottom */
+.slide-dots {
+  display: flex;
+  gap: 0.7vmin;
+  align-items: center;
+  padding: 1.2vmin 0 1.5vmin;
+  flex-shrink: 0;
+  justify-content: center;
+}
+.slide-dot {
+  width: clamp(6px, 0.65vmin, 8px);
+  height: clamp(6px, 0.65vmin, 8px);
+  border-radius: 50%;
+  background: #c8c3bd;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  padding: 0;
+}
+.slide-dot[data-active] {
+  background: #ee6823;
+  transform: scale(1.3);
+}
+.slide-dot:hover:not([data-active]) {
+  background: #9a9590;
+}
+
+/* ── Base slide layout ───────────────────────────────────────────────────── */
+.slide {
+  width: 100%;
+  max-width: min(960px, 82%);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vmin, 28px);
+}
+.slide--center {
+  align-items: center;
+  text-align: center;
+}
+/* Title slide runs a little wider so the hero "Understanding Spec Kit"
+   holds one line (the shared .slide cap of 960px wraps it after "Spec"). */
+.slide.slide--title {
+  max-width: min(1080px, 90%);
+}
+
+/* ── Typography — vmin units for 16:10 viewport scaling ─────────────────── */
+/*    At 1080p (vmin = 10.8px): body ≈ 24px, h1 ≈ 54px, hero ≈ 86px          */
+/*    Contrast: #20282D on #FFFAF6 ≈ 14.7:1 · #404850 ≈ 8.9:1 · #004AB9 ≈ 7.5:1 */
+
+.sl-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(18px, 2.1vmin, 24px);
+  color: #404850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.sl-label-n {
+  color: #ee6823;
+  font-weight: 700;
+} /* bold satisfies WCAG large-text 3:1 threshold at ≥18.67px */
+.sl-label-sep {
+  color: #c8c3bd;
+} /* decorative separator */
+
+.sl-h1 {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(32px, 5vmin, 68px);
+  font-weight: 700;
+  color: #000000;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.sl-h1--hero {
+  font-size: clamp(56px, 8vmin, 100px);
+  letter-spacing: -0.04em;
+}
+
+.sl-h2 {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(36px, 5vmin, 68px);
+  font-weight: 600;
+  color: #20282d;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.sl-pre-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(14px, 2vmin, 24px);
+  color: #ee6823;
+  letter-spacing: 0.05em;
+}
+
+.sl-tagline {
+  font-family: "Heebo", sans-serif;
+  font-size: clamp(20px, 2.5vmin, 30px);
+  color: #404850;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.sl-byline {
+  font-size: clamp(18px, 2.1vmin, 24px);
+  color: #4a525b;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.sl-body {
+  font-size: clamp(22px, 2.5vmin, 32px);
+  line-height: 1.65;
+  color: #20282d;
+}
+.sl-body--center {
+  text-align: center;
+}
+
+.sl-em {
+  color: #ee6823;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.sl-quote {
+  font-size: clamp(20px, 2.8vmin, 36px);
+  line-height: 1.55;
+  color: #20282d;
+  border-left: 3px solid #ee6823;
+  padding-left: 2.5vmin;
+  font-style: normal;
+}
+.sl-quote--amber {
+  border-left-color: #ee6823;
+}
+/* Hero quote — full-slide epigraph (the requirements creed cold open).
+   Centered, no left border (the border motif reads off-axis when centered). */
+.sl-quote--hero {
+  border-left: none;
+  padding-left: 0;
+  text-align: center;
+  font-style: italic;
+  font-size: clamp(32px, 5.5vmin, 64px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  max-width: 24ch;
+  margin: 0 auto;
+}
+/* Oversized decorative opening quotation mark — the "this is a quote" signal. */
+.sl-quote-mark {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: normal;
+  font-size: clamp(90px, 14vmin, 180px);
+  line-height: 0.5;
+  color: #ee6823;
+  margin-bottom: 0.18em;
+}
+.sl-quote--hero .sl-cite {
+  margin-top: 1.1em;
+  font-size: clamp(22px, 2.8vmin, 36px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.sl-cite {
+  display: block;
+  margin-top: 0.7em;
+  font-family: "Heebo", sans-serif;
+  font-size: clamp(13px, 1.5vmin, 18px);
+  font-style: italic;
+  color: #404850;
+  letter-spacing: 0.01em;
+}
+
+.sl-cmd {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9em;
+  color: inherit;
+}
+
+.sl-caption {
+  font-size: clamp(18px, 2.1vmin, 24px);
+  color: #404850;
+  line-height: 1.55;
+  padding-top: 4px;
+}
+.sl-caption--muted {
+  color: #606870;
+  font-style: italic;
+}
+
+.sl-annotation {
+  display: block;
+  margin-top: 2.2em;
+  text-align: center;
+  font-family: "Caveat", cursive;
+  font-size: clamp(32px, 4vmin, 56px);
+  font-weight: 500;
+  color: #3a6fd8;
+  line-height: 1.35;
+  transform: rotate(-2deg);
+  transform-origin: center center;
+}
+
+.sl-kbd-hint {
+  font-size: clamp(11px, 1.2vmin, 14px);
+  color: #606870;
+  letter-spacing: 0.04em;
+}
+kbd {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9em;
+  background: #ede6dc;
+  border: 1px solid #c8c3bd;
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: #20282d;
+}
+
+/* ── Mapping table ───────────────────────────────────────────────────────── */
+.sl-mapping {
+  border: 1px solid #d4cfc9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.sl-mapping-head {
+  display: grid;
+  grid-template-columns: 22% 1fr;
+  padding: 0.7vmin 1.5vmin;
+  background: #f4efe9;
+  font-size: clamp(9px, 1vmin, 12px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #404850;
+  gap: 2vmin;
+}
+.sl-mapping-row {
+  display: grid;
+  grid-template-columns: 22% 1fr;
+  padding: 0.8vmin 1.5vmin;
+  gap: 2vmin;
+  align-items: center;
+  border-top: 1px solid #e4ddd7;
+  background: #fffaf6;
+  transition: background 0.12s;
+}
+.sl-mapping-row:hover {
+  background: #f4efe9;
+}
+.sl-mapping-row .sl-cmd {
+  font-size: clamp(10px, 1.3vmin, 16px);
+}
+.sl-mapping-analog {
+  font-size: clamp(11px, 1.5vmin, 18px);
+  color: #404850;
+  line-height: 1.35;
+}
+
+/* ── Constitution two-col ────────────────────────────────────────────────── */
+.sl-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2vmin;
+}
+.sl-card {
+  background: #f4efe9;
+  border: 1px solid color-mix(in srgb, var(--card-color) 30%, #d4cfc9);
+  border-top-width: 3px;
+  border-top-color: var(--card-color);
+  border-radius: 8px;
+  padding: 2vmin;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7vmin;
+}
+.sl-card-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(14px, 1.8vmin, 22px);
+  font-weight: 500;
+  color: var(--card-color);
+  letter-spacing: -0.01em;
+}
+.sl-card-sub {
+  font-size: clamp(10px, 1.1vmin, 13px);
+  color: #606870;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.sl-card-body {
+  font-size: clamp(13px, 1.5vmin, 18px);
+  color: #20282d;
+  line-height: 1.55;
+  flex: 1;
+}
+.sl-card-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: clamp(9px, 1vmin, 12px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-color);
+  border: 1px solid color-mix(in srgb, var(--card-color) 40%, transparent);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 0.5vmin;
+}
+
+/* ── Workflow slide ───────────────────────────────────────────────────────── */
+.sl-wf-points {
+  display: flex;
+  flex-direction: column;
+  gap: 2vmin;
+  max-width: min(680px, 80%);
+  text-align: left;
+}
+.sl-wf-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4vmin;
+  font-size: clamp(16px, 2vmin, 24px);
+  color: #20282d;
+  line-height: 1.5;
+}
+.sl-wf-dot {
+  width: clamp(7px, 0.8vmin, 10px);
+  height: clamp(7px, 0.8vmin, 10px);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.7em;
+}
+/* Ingage primary filled button: orange bg, white bold text (large-text rule applies) */
+.sl-launch-btn {
+  background: #ee6823;
+  border: none;
+  color: #ffffff;
+  font-family: "Heebo", sans-serif;
+  font-size: clamp(18px, 2.2vmin, 26px);
+  font-weight: 700;
+  padding: 1.1vmin 3vmin;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+  letter-spacing: 0.02em;
+  margin-top: 0.8vmin;
+}
+.sl-launch-btn:hover {
+  background: #d45d1b;
+  box-shadow: 0 4px 18px rgba(238, 104, 35, 0.3);
+}
+
+/* ── Bullet list ─────────────────────────────────────────────────────────── */
+/* ── Bullet lists ────────────────────────────────────────────────────────────
+   Hanging-marker base shared by .sl-bullets (slides) and .detail-pts (flow
+   detail panel). Per-list differences (gap, font-size, line-height, marker
+   weight) live in the small per-list rules that follow / in the detail panel
+   section. Marker color and --bullet-hang are defined once, here. */
+.sl-bullets,
+.detail-pts {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.sl-bullets li,
+.detail-pts li {
+  color: #20282d;
+  padding-left: var(--bullet-hang);
+  position: relative;
+}
+.sl-bullets li::before,
+.detail-pts li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: #20282d;
+}
+
+/* Slide bullets */
+.sl-bullets {
+  gap: 1.2vmin;
+}
+.sl-bullets li {
+  font-size: clamp(22px, 2.5vmin, 30px);
+  line-height: 1.55;
+}
+.sl-bullets li::before {
+  font-weight: 700;
+}
+
+/* ── Install command — light chip, native to the deck ────────────────────── */
+.sl-install {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: 0.35em;
+  /* Set the install block apart from the repo link above it. */
+  margin-top: clamp(10px, 2vmin, 28px);
+  background: #f4efe9;
+  border: 1px solid #d4cfc9;
+  border-radius: 8px;
+  padding: 1.1vmin 1.8vmin;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(18px, 2.2vmin, 26px);
+  color: #404850;
+  line-height: 1.4;
+  max-width: min(820px, 92%);
+  text-align: left;
+}
+/* One shell command per row: orange prompt + the command. */
+.sl-install-line {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2vmin;
+}
+/* Wrapped continuation of the previous command (the `\`-broken line),
+   indented to sit under the command, past the "$ " prompt. */
+.sl-install-line--cont {
+  padding-left: calc(1ch + 1.2vmin);
+}
+.sl-install code {
+  font: inherit;
+  overflow-wrap: anywhere;
+}
+.sl-install-prompt {
+  color: #ee6823;
+  font-weight: 700;
+  flex-shrink: 0;
+  user-select: none;
+}
+/* Repo CTA: the value-prop line and its URL read as one tight unit, so they
+   group with a small internal gap instead of the slide's full flex gap. */
+.sl-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+.sl-mono-link {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(22px, 2.5vmin, 32px);
+  color: #004ab9;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+
+/* ── Self-referential spec.md card ───────────────────────────────────────── */
+.sl-spec {
+  background: #ffffff;
+  border: 1px solid #d4cfc9;
+  border-left: 3px solid #ee6823;
+  border-radius: 8px;
+  padding: 1.6vmin 2vmin;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(11px, 1.45vmin, 17px);
+  line-height: 1.7;
+  color: #20282d;
+  text-align: left;
+  white-space: pre;
+  overflow: hidden;
+}
+.sl-spec .tok-h {
+  color: #554993;
+  font-weight: 500;
+} /* # heading */
+.sl-spec .tok-sec {
+  color: #554993;
+  font-weight: 500;
+} /* ## section */
+.sl-spec .tok-box {
+  color: #0a6864;
+} /* [ ] checkbox */
+.sl-spec .tok-mut {
+  color: #8a8580;
+} /* dim / punctuation */
+
+.sl-spec-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sl-spec-file {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(10px, 1.25vmin, 14px);
+  color: #5a5550;
+  background: #f2ede8;
+  border: 1px solid #d4cfc9;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  padding: 0.25em 0.75em;
+  line-height: 1;
+  user-select: none;
+  align-self: flex-start;
+}
+.sl-spec-wrap .sl-spec {
+  border-top-left-radius: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sl-spec-caption {
+  font-size: clamp(13px, 1.6vmin, 19px);
+  color: #404850;
+  line-height: 1.5;
+  margin-top: 0.4vmin;
+}
+.sl-spec-caption em {
+  font-style: italic;
+  color: #ee6823;
+}
+
+/* ── Lifecycle chips (SDD slide) ─────────────────────────────────────────── */
+/* ── Two-column slide: text left, visual right ───────────────────────────── */
+.sl-split {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 4vmin;
+  align-items: center; /* centre the visual against the text block */
+  width: 100%;
+}
+.sl-split-main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vmin, 28px);
+  min-width: 0; /* let text wrap instead of overflowing the grid */
+}
+.sl-split-aside {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sl-chips {
+  display: flex;
+  flex-direction: column; /* vertical flow, mirrors the #spec-kit-flow backbone */
+  align-items: center; /* centre the arrows under the chip column */
+  gap: 0.5vmin;
+}
+.sl-chip {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(14px, 2vmin, 26px);
+  font-weight: 600;
+  color: #20282d;
+  background: #f4efe9;
+  border: 1px solid #d4cfc9;
+  border-radius: 999px;
+  padding: 0.7vmin 2vmin;
+  min-width: clamp(
+    180px,
+    22vmin,
+    250px
+  ); /* uniform width -> clean vertical column */
+  text-align: center;
+}
+.sl-chip-arrow {
+  color: #ee6823;
+  font-size: clamp(18px, 2.2vmin, 26px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ── What's Next invite line ─────────────────────────────────────────────── */
+.sl-invite {
+  /* Two stacked paragraphs under one orange bar: the offer, then the where. */
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(18px, 2.6vmin, 34px);
+  font-weight: 600;
+  color: #20282d;
+  line-height: 1.35;
+  border-left: 3px solid #ee6823;
+  padding-left: 2.2vmin;
+  /* Extra breathing room below the heading on the standalone close slide,
+     on top of the slide's flex gap, so the invite reads as its own beat. */
+  margin-top: clamp(24px, 4vmin, 56px);
+}
+.sl-invite p {
+  margin: 0;
+}
+.sl-invite em {
+  font-style: normal;
+  color: #ee6823;
+  font-weight: 700;
+}
+
+/* Tight annotation variant — second b-corp touch, smaller to fit dense slides */
+.sl-annotation--tight {
+  margin-top: 1em;
+  font-size: clamp(32px, 4vmin, 56px);
+}
+
+/* ── Q&A grid ────────────────────────────────────────────────────────────── */
+.sl-qa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4vmin;
+  width: 100%;
+}
+.sl-qa-item {
+  background: #f4efe9;
+  border: 1px solid #d4cfc9;
+  border-radius: 7px;
+  padding: 1.4vmin 1.6vmin;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vmin;
+}
+.sl-qa-q {
+  font-size: clamp(13px, 1.6vmin, 19px);
+  font-weight: 500;
+  color: #20282d;
+  line-height: 1.4;
+}
+.sl-qa-a {
+  font-size: clamp(12px, 1.4vmin, 17px);
+  color: #404850;
+  line-height: 1.45;
+}
