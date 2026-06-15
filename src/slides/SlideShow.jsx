@@ -1,3 +1,9 @@
+// This module is a registry of slide components plus the SLIDE_REGISTRY map the
+// variant manifest indexes into. The non-component export trips react-refresh's
+// "only export components" rule (as the old SLIDE_SLUGS export did); fast-refresh
+// of a single slide is not worth splitting the deck across files.
+/* eslint-disable react-refresh/only-export-components */
+
 // ── Primitives ──────────────────────────────────────────────────────────────
 
 function Label({ n, title }) {
@@ -11,8 +17,24 @@ function Label({ n, title }) {
 }
 
 // ── Individual slides ─────────────────────────────────────────────────────────
+//
+// Slides are pure components, registered by id in SLIDE_REGISTRY and ordered per
+// variant by the manifest in src/data/variants.js (architecture C). The section
+// counter ("01" …) is NOT hardcoded here: it varies per variant, so numbered
+// slides receive it as the `section` prop and the manifest supplies the value.
+// Per-variant copy differences are passed as props too (see byline / close).
 
-function TitleSlide() {
+function TitleSlide({
+  tagline = (
+    <>
+      Structured requirements an agent can act on.
+      <br />
+      Results that land closer to done.
+      <br />
+      Fits how we already work.
+    </>
+  ),
+}) {
   return (
     <div className="slide slide--center slide--title">
       <img
@@ -21,13 +43,7 @@ function TitleSlide() {
         className="sl-logo-hero"
       />
       <h1 className="sl-h1 sl-h1--hero">Understanding Spec&nbsp;Kit</h1>
-      <p className="sl-tagline">
-        Structured requirements an agent can act on.
-        <br />
-        Results that land closer to done.
-        <br />
-        Fits how we already work.
-      </p>
+      <p className="sl-tagline">{tagline}</p>
     </div>
   );
 }
@@ -49,10 +65,10 @@ function RequirementsSlide() {
   );
 }
 
-function HookSlide() {
+function HookSlide({ section }) {
   return (
     <div className="slide">
-      <Label n={1} title="What’s the Problem?" />
+      <Label n={section} title="What’s the Problem?" />
       <h1 className="sl-h1">
         Speed isn’t the problem.
         <br />
@@ -72,10 +88,10 @@ function HookSlide() {
   );
 }
 
-function SddSlide() {
+function SddSlide({ section }) {
   return (
     <div className="slide">
-      <Label n={2} title="What’s Spec-Driven Development?" />
+      <Label n={section} title="What’s Spec-Driven Development?" />
       <div className="sl-split">
         <div className="sl-split-main">
           <h1 className="sl-h1">It’s the workflow you already do.</h1>
@@ -110,10 +126,10 @@ function SddSlide() {
   );
 }
 
-function SpecKitSlide() {
+function SpecKitSlide({ section }) {
   return (
     <div className="slide">
-      <Label n={3} title="What’s Spec Kit?" />
+      <Label n={section} title="What’s Spec Kit?" />
       <h1 className="sl-h1">Specs, plans, and tasks, as plain Markdown.</h1>
       <p className="sl-body">
         Spec Kit is the toolkit that puts SDD into practice. It’s{" "}
@@ -152,10 +168,10 @@ function SpecKitSlide() {
   );
 }
 
-function PredictabilitySlide() {
+function PredictabilitySlide({ section }) {
   return (
     <div className="slide">
-      <Label n={5} title="Why Should I Care?" />
+      <Label n={section} title="Why Should I Care?" />
       <h1 className="sl-h1">
         Less rework.
         <br />
@@ -178,10 +194,10 @@ function PredictabilitySlide() {
   );
 }
 
-function HonestCloseSlide() {
+function HonestCloseSlide({ section }) {
   return (
     <div className="slide">
-      <Label n={6} title="What Am I Still Figuring Out?" />
+      <Label n={section} title="What Am I Still Figuring Out?" />
       <h2 className="sl-h2">
         I’ve walked you through this like I’ve got it figured out. I don’t.
       </h2>
@@ -209,10 +225,10 @@ function HonestCloseSlide() {
 // Where to start: the repo link and the install one-liner. Developer-facing
 // "go do it" half of the former combined close; the explicit ask now lives on
 // its own WhatsNextSlide.
-function WhereToStartSlide() {
+function WhereToStartSlide({ section }) {
   return (
     <div className="slide">
-      <Label n={7} title="Where to start?" />
+      <Label n={section} title="Where to start?" />
       <h1 className="sl-h1">Your turn.</h1>
       <p className="sl-mono-link">https://github.com/github/spec-kit</p>
       <div className="sl-install">
@@ -234,55 +250,44 @@ function WhereToStartSlide() {
 
 // The close: the explicit ask, on its own. Picks up the open questions from the
 // previous slide and turns them into an invitation to keep talking. This is the
-// load-bearing beat (see docs/speaker-notes.md → closing guardrails).
-function WhatsNextSlide() {
+// load-bearing beat (see docs/speaker-notes.md → closing guardrails). The
+// invite line varies per variant (internal Slack vs. community), so it is a prop.
+function WhatsNextSlide({
+  section,
+  invite = (
+    <>
+      <p>
+        If you’re poking at any of this, <em>I want to compare notes.</em>
+      </p>
+      <p>
+        Let’s pick it up in our <em>#ai-practitioners</em> Slack channel.
+      </p>
+    </>
+  ),
+}) {
   return (
     <div className="slide">
-      <Label n={8} title="What’s Next?" />
+      <Label n={section} title="What’s Next?" />
       <h1 className="sl-h1">Let’s keep talking.</h1>
-      <div className="sl-invite">
-        <p>
-          If you’re poking at any of this, <em>I want to compare notes.</em>
-        </p>
-        <p>
-          Let’s pick it up in our <em>#ai-practitioners</em> Slack channel.
-        </p>
-      </div>
+      <div className="sl-invite">{invite}</div>
     </div>
   );
 }
 
-// ── SlideShow ────────────────────────────────────────────────────────────────
+// ── Slide registry ───────────────────────────────────────────────────────────
+//
+// Maps the stable slide `id` (used in the variant manifest) to its component.
+// The manifest (src/data/variants.js) decides which slides appear, in what
+// order, with which section number and props, per talk variant.
 
-export const SLIDE_COUNT = 9;
-export const FLOW_SLIDE_INDEX = 4; // SpecKitSlide — advancing past here enters the flow
-
-// Stable URL slugs, one per slide, in the same order as the slides array below.
-// Used for shareable deep links (e.g. #whats-sdd). Keep in sync when adding/reordering slides.
-// eslint-disable-next-line react-refresh/only-export-components
-export const SLIDE_SLUGS = [
-  "title",
-  "quote-requirements",
-  "whats-the-problem",
-  "whats-sdd",
-  "whats-spec-kit",
-  "why-should-i-care",
-  "what-am-i-still-figuring-out",
-  "where-to-start",
-  "whats-next",
-];
-
-export default function SlideShow({ slideIndex }) {
-  const slides = [
-    <TitleSlide key="title" />,
-    <RequirementsSlide key="requirements" />,
-    <HookSlide key="hook" />,
-    <SddSlide key="sdd" />,
-    <SpecKitSlide key="spec-kit" />,
-    <PredictabilitySlide key="benefits" />,
-    <HonestCloseSlide key="honest-close" />,
-    <WhereToStartSlide key="where-to-start" />,
-    <WhatsNextSlide key="whats-next" />,
-  ];
-  return slides[slideIndex] ?? null;
-}
+export const SLIDE_REGISTRY = {
+  title: TitleSlide,
+  requirements: RequirementsSlide,
+  hook: HookSlide,
+  sdd: SddSlide,
+  specKit: SpecKitSlide,
+  why: PredictabilitySlide,
+  honestClose: HonestCloseSlide,
+  whereToStart: WhereToStartSlide,
+  whatsNext: WhatsNextSlide,
+};

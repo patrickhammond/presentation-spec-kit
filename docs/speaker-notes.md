@@ -6,7 +6,7 @@ The deck carries the words; you carry the personality. Each slide below lists 2â
 
 ## Per-slide timings (target: 7â€“8 min total)
 
-Delivery order. The flow is its own timed block, not a numbered slide. Code-level indices live in `CLAUDE.md` (`SLIDE_COUNT = 9`, `FLOW_SLIDE_INDEX = 4`).
+Delivery order for the `ingage` variant. The flow is its own timed block, not a numbered slide. Slide order and section numbers are defined per variant in `src/data/variants.js` (see `CLAUDE.md`).
 
 | Slide   | Section                                    | Target |
 | ------- | ------------------------------------------ | ------ |

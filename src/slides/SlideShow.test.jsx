@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { axe } from "jest-axe";
-import SlideShow, { SLIDE_COUNT, SLIDE_SLUGS } from "./SlideShow";
+import { SLIDE_REGISTRY } from "./SlideShow";
+import { VARIANTS } from "../data/variants.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const indexCss = readFileSync(resolve(__dirname, "../index.css"), "utf8");
@@ -19,29 +20,41 @@ const AXE_OPTS = {
   },
 };
 
-describe("SlideShow – WCAG & copy-rule checks", () => {
-  for (let i = 0; i < SLIDE_COUNT; i++) {
-    const slug = SLIDE_SLUGS[i];
+// Every slide entry across every variant (architecture C: slides are rendered
+// from the per-variant manifest, not a fixed index). Deduplicated by the
+// id + section + props combination a variant actually renders.
+const slideCases = Object.entries(VARIANTS).flatMap(([variant, { entries }]) =>
+  entries.filter((e) => e.type === "slide").map((e) => ({ variant, ...e })),
+);
 
-    describe(`slide ${i}: ${slug}`, () => {
+function renderSlide({ id, section, props }) {
+  const Slide = SLIDE_REGISTRY[id];
+  return render(<Slide section={section} {...(props || {})} />);
+}
+
+describe("SlideShow – WCAG & copy-rule checks", () => {
+  for (const slideCase of slideCases) {
+    const { variant, id, slug } = slideCase;
+
+    describe(`${variant} / ${id} (${slug})`, () => {
       it("has no axe violations", async () => {
-        const { container } = render(<SlideShow slideIndex={i} />);
+        const { container } = renderSlide(slideCase);
         expect(await axe(container, AXE_OPTS)).toHaveNoViolations();
       });
 
       it("contains no em dashes", () => {
-        const { container } = render(<SlideShow slideIndex={i} />);
+        const { container } = renderSlide(slideCase);
         expect(container.textContent).not.toContain("—");
       });
 
       it("uses curly apostrophes, not straight, in contractions", () => {
-        const { container } = render(<SlideShow slideIndex={i} />);
+        const { container } = renderSlide(slideCase);
         // Straight apostrophe (U+0027) between letters = straight quote in copy
         expect(container.textContent).not.toMatch(/[A-Za-z]'[A-Za-z]/);
       });
 
       it("all images have non-empty alt text", () => {
-        const { container } = render(<SlideShow slideIndex={i} />);
+        const { container } = renderSlide(slideCase);
         container.querySelectorAll("img").forEach((img) => {
           // Decorative images carry role="presentation" and intentionally use alt=""
           if (img.getAttribute("role") !== "presentation") {
