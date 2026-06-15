@@ -27,7 +27,7 @@ Single-project SPA: `src/` and `tests/` at the repository root (per plan.md).
 
 **Purpose**: Make room for the new module.
 
-- [ ] T001 Create the `src/picker/` directory (sibling of `src/slides/` and `src/flow/`).
+- [x] T001 Create the `src/picker/` directory (sibling of `src/slides/` and `src/flow/`).
 
 ---
 
@@ -35,9 +35,9 @@ Single-project SPA: `src/` and `tests/` at the repository root (per plan.md).
 
 **Purpose**: The data and resolution plumbing every user story depends on. MUST complete before Phase 3+.
 
-- [ ] T002 Extend each variant in `src/data/variants.js` with a `meta` object (`room`, `length`, `demo`) using the values in `specs/001-variant-picker/data-model.md` (ingage: "Internal, mixed dev + delivery" / "7-8 min" / false; gdg: "Community, all developers" / "~40 min" / true). Use curly quotes, no em dashes.
-- [ ] T003 In `src/data/variants.js`, add an `isKnownVariant(key)` helper (true only for keys in `VARIANTS`) and export it; keep `DEFAULT_VARIANT` and `resolveVariant` but stop using `resolveVariant` for the no-param case. Single source of truth for "what variants exist."
-- [ ] T004 In `src/App.jsx`, compute a load-time mode from `?variant=`: no param or unknown key -> `picker`; known key -> `deck`. Use `isKnownVariant`. Do not silently apply `DEFAULT_VARIANT` on the no-param path. (Behavior per case is refined and tested in the story phases.)
+- [x] T002 Extend each variant in `src/data/variants.js` with a `meta` object (`room`, `length`, `demo`) using the values in `specs/001-variant-picker/data-model.md` (ingage: "Internal, mixed dev + delivery" / "7-8 min" / false; gdg: "Community, all developers" / "~40 min" / true). Use curly quotes, no em dashes.
+- [x] T003 In `src/data/variants.js`, add an `isKnownVariant(key)` helper (true only for keys in `VARIANTS`) and export it; keep `DEFAULT_VARIANT` and `resolveVariant` but stop using `resolveVariant` for the no-param case. Single source of truth for "what variants exist."
+- [x] T004 In `src/App.jsx`, compute a load-time mode from `?variant=`: no param or unknown key -> `picker`; known key -> `deck`. Use `isKnownVariant`. Do not silently apply `DEFAULT_VARIANT` on the no-param path. (Behavior per case is refined and tested in the story phases.)
 
 **Checkpoint**: variants carry display metadata and App can tell picker mode from deck mode.
 
@@ -49,11 +49,11 @@ Single-project SPA: `src/` and `tests/` at the repository root (per plan.md).
 
 **Independent Test**: Open the app with no `?variant=`; confirm a picker lists all variants with name/room/length/demo; select one and confirm that talk opens at its first slide with `?variant=<key>` in the address.
 
-- [ ] T005 [US1] Create `src/picker/VariantPicker.jsx`: render one selectable native control per entry in `VARIANTS` (in declaration order), each showing `label`, `meta.room`, `meta.length`, and a live-demo indicator from `meta.demo`. Read the manifest; hardcode no variant list. Props: `onSelect(key)`. Curly quotes, no em dashes.
-- [ ] T006 [US1] Add `.picker-*` styles to `src/index.css`: vmin-scaled type, 16:10 layout, Ingage Warm White light theme, focus-visible states, contrast >= 4.5:1. No inline styles in the component; pass any per-render value as a CSS custom property.
-- [ ] T007 [US1] In `src/App.jsx`, render `<VariantPicker>` when mode is `picker`; on `onSelect(key)`, set `?variant=<key>` and enter the deck at its first slide (reset in-deck location).
-- [ ] T008 [US1] In `src/App.jsx`, add a "back to picker" affordance available within a talk (FR-011): clear `?variant=` so resolution returns to picker mode. Keyboard reachable, labeled.
-- [ ] T009 [P] [US1] Create `src/picker/VariantPicker.test.jsx`: render the picker, assert one control per `VARIANTS` key with its `label`/`meta`, jest-axe clean, no straight quotes (`/[A-Za-z]'[A-Za-z]/`), no em dashes, and every control keyboard-focusable.
+- [x] T005 [US1] Create `src/picker/VariantPicker.jsx`: render one selectable native control per entry in `VARIANTS` (in declaration order), each showing `label`, `meta.room`, `meta.length`, and a live-demo indicator from `meta.demo`. Read the manifest; hardcode no variant list. Props: `onSelect(key)`. Curly quotes, no em dashes.
+- [x] T006 [US1] Add `.picker-*` styles to `src/index.css`: vmin-scaled type, 16:10 layout, Ingage Warm White light theme, focus-visible states, contrast >= 4.5:1. No inline styles in the component; pass any per-render value as a CSS custom property.
+- [x] T007 [US1] In `src/App.jsx`, render `<VariantPicker>` when mode is `picker`; on `onSelect(key)`, set `?variant=<key>` and enter the deck at its first slide (reset in-deck location).
+- [x] T008 [US1] In `src/App.jsx`, add a "back to picker" affordance available within a talk (FR-011): clear `?variant=` so resolution returns to picker mode. Keyboard reachable, labeled.
+- [x] T009 [P] [US1] Create `src/picker/VariantPicker.test.jsx`: render the picker, assert one control per `VARIANTS` key with its `label`/`meta`, jest-axe clean, no straight quotes (`/[A-Za-z]'[A-Za-z]/`), no em dashes, and every control keyboard-focusable.
 
 **Checkpoint**: US1 is a usable MVP on its own (picker shows, choosing works, you can return to it).
 
@@ -65,8 +65,8 @@ Single-project SPA: `src/` and `tests/` at the repository root (per plan.md).
 
 **Independent Test**: Open `?variant=ingage` -> Ingage deck, no picker. Open `?variant=gdg#whats-sdd` -> GDG deck at that slide.
 
-- [ ] T010 [US2] Verify/adjust `src/App.jsx` resolution so a known `?variant=` enters the deck directly and the existing hash deep-link (`#slug`, `#spec-kit-flow/<id>`) still resolves within the chosen variant. No picker shown.
-- [ ] T011 [P] [US2] Add a resolution test (e.g. in `src/picker/VariantPicker.test.jsx` or a new `src/App.resolve.test.jsx`): known key -> deck mode; known key + hash -> deck mode preserving the hash; assert picker is not shown.
+- [x] T010 [US2] Verify/adjust `src/App.jsx` resolution so a known `?variant=` enters the deck directly and the existing hash deep-link (`#slug`, `#spec-kit-flow/<id>`) still resolves within the chosen variant. No picker shown.
+- [x] T011 [P] [US2] Add a resolution test (e.g. in `src/picker/VariantPicker.test.jsx` or a new `src/App.resolve.test.jsx`): known key -> deck mode; known key + hash -> deck mode preserving the hash; assert picker is not shown.
 
 **Checkpoint**: deep links behave exactly as before US1 landed.
 
@@ -78,8 +78,8 @@ Single-project SPA: `src/` and `tests/` at the repository root (per plan.md).
 
 **Independent Test**: Open `?variant=zzz` -> picker shown.
 
-- [ ] T012 [US3] Confirm `src/App.jsx` resolution routes an unknown `?variant=` to picker mode (covered by T004's `isKnownVariant` check); ensure no console error and no arbitrary deck.
-- [ ] T013 [P] [US3] Add a resolution test: unknown key -> picker mode (not deck, not a default variant).
+- [x] T012 [US3] Confirm `src/App.jsx` resolution routes an unknown `?variant=` to picker mode (covered by T004's `isKnownVariant` check); ensure no console error and no arbitrary deck.
+- [x] T013 [P] [US3] Add a resolution test: unknown key -> picker mode (not deck, not a default variant).
 
 **Checkpoint**: all three resolution cases (none / known / unknown) verified.
 
@@ -87,9 +87,9 @@ Single-project SPA: `src/` and `tests/` at the repository root (per plan.md).
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T014 [P] Update `docs/tech-stack.md` (project structure + a line on picker resolution) and the `src/data/variants.js` header comment to document the `meta` field and picker-driven resolution.
+- [x] T014 [P] Update `docs/tech-stack.md` (project structure + a line on picker resolution) and the `src/data/variants.js` header comment to document the `meta` field and picker-driven resolution.
 - [ ] T015 [P] Optionally extend `tests/a11y.spec.js` with a Playwright check of the picker route (no axe violations, keyboard select).
-- [ ] T016 Run `npm run lint`, `npm test`, and `npm run build`; confirm all green and the rendered-copy audit (`grep -rnE "[A-Za-z]'[A-Za-z]" src` over visible strings) is clean. Walk `specs/001-variant-picker/quickstart.md` scenarios.
+- [x] T016 Run `npm run lint`, `npm test`, and `npm run build`; confirm all green and the rendered-copy audit (`grep -rnE "[A-Za-z]'[A-Za-z]" src` over visible strings) is clean. Walk `specs/001-variant-picker/quickstart.md` scenarios.
 
 ---
 

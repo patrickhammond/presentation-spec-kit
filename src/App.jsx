@@ -1,66 +1,89 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SpecKitFlow from "./flow/SpecKitFlow.jsx";
 import { SLIDE_REGISTRY } from "./slides/SlideShow.jsx";
-import { VARIANTS, resolveVariant } from "./data/variants.js";
+import { VARIANTS, isKnownVariant } from "./data/variants.js";
 import { STEP_IDS } from "./data/steps.js";
-
-// The active talk variant is chosen by the ?variant= query param at load time
-// and stays fixed for the session (switching it is a reload). The in-deck
-// location lives in the URL hash, so a variant + a spot is fully shareable
-// (e.g. /?variant=ingage#whats-sdd). See src/data/variants.js.
-const VARIANT_KEY = resolveVariant(
-  new URLSearchParams(window.location.search).get("variant"),
-);
-const ENTRIES = VARIANTS[VARIANT_KEY].entries;
-const FLOW_INDEX = ENTRIES.findIndex((e) => e.type === "flow");
+import VariantPicker from "./picker/VariantPicker.jsx";
 
 const FLOW_SLUG = "spec-kit-flow";
 
-function entryIndexBySlug(slug) {
-  return ENTRIES.findIndex((e) => e.slug === slug);
+function readVariantParam() {
+  return new URLSearchParams(window.location.search).get("variant");
 }
 
-// ── URL hash <-> in-deck location (shareable / deep-linkable) ────────────────
-//   (no hash)                       -> first entry (title)
-//   #whats-the-problem, #whats-sdd… -> that slide, by slug
-//   #spec-kit-flow                  -> interactive flow, overview
-//   #spec-kit-flow/analyze          -> interactive flow, focused on a step node
-function parseHash() {
-  const raw = window.location.hash.replace(/^#\/?/, "");
-  if (!raw) return { index: 0, activeId: null };
-  if (raw === FLOW_SLUG) return { index: FLOW_INDEX, activeId: null };
-  if (raw.startsWith(`${FLOW_SLUG}/`)) {
-    const id = raw.slice(FLOW_SLUG.length + 1);
-    return {
-      index: FLOW_INDEX,
-      activeId: STEP_IDS.includes(id) ? id : null,
-    };
-  }
-  const idx = entryIndexBySlug(raw);
-  return idx === -1
-    ? { index: 0, activeId: null }
-    : { index: idx, activeId: null };
+// Choosing a variant reflects it in the URL; the reload enters deck mode at the
+// first slide (no hash). The variant is fixed for the session, so switching is a
+// reload, consistent with how variant resolution already works.
+function selectVariant(key) {
+  window.location.search = `?variant=${encodeURIComponent(key)}`;
 }
 
-function locationToHash(index, activeId) {
-  const entry = ENTRIES[index];
-  if (!entry) return "";
-  if (entry.type === "flow")
-    return activeId ? `#${FLOW_SLUG}/${activeId}` : `#${FLOW_SLUG}`;
-  return `#${entry.slug}`;
+// Returning to the picker drops the variant (and any in-deck hash) so resolution
+// falls back to picker mode.
+function backToPicker() {
+  window.location.assign(window.location.pathname);
 }
 
 export default function App() {
+  const variantKey = readVariantParam();
+  // No variant, or an unknown one: show the picker rather than silently
+  // defaulting. A known variant goes straight into its deck, preserving the
+  // existing deep-link behavior (including the in-deck hash).
+  if (!isKnownVariant(variantKey)) {
+    return <VariantPicker onSelect={selectVariant} />;
+  }
+  return <Deck variantKey={variantKey} />;
+}
+
+function Deck({ variantKey }) {
+  const entries = VARIANTS[variantKey].entries;
+  const flowIndex = entries.findIndex((e) => e.type === "flow");
+
+  // ── URL hash <-> in-deck location (shareable / deep-linkable) ──────────────
+  //   (no hash)                       -> first entry (title)
+  //   #whats-the-problem, #whats-sdd… -> that slide, by slug
+  //   #spec-kit-flow                  -> interactive flow, overview
+  //   #spec-kit-flow/analyze          -> interactive flow, focused on a step node
+  // entries is stable for the session (fixed variant), so these are memoized and
+  // can be honest effect dependencies without re-running on every render.
+  const parseHash = useCallback(() => {
+    const raw = window.location.hash.replace(/^#\/?/, "");
+    if (!raw) return { index: 0, activeId: null };
+    if (raw === FLOW_SLUG) return { index: flowIndex, activeId: null };
+    if (raw.startsWith(`${FLOW_SLUG}/`)) {
+      const id = raw.slice(FLOW_SLUG.length + 1);
+      return {
+        index: flowIndex,
+        activeId: STEP_IDS.includes(id) ? id : null,
+      };
+    }
+    const idx = entries.findIndex((e) => e.slug === raw);
+    return idx === -1
+      ? { index: 0, activeId: null }
+      : { index: idx, activeId: null };
+  }, [entries, flowIndex]);
+
+  const locationToHash = useCallback(
+    (index, activeId) => {
+      const entry = entries[index];
+      if (!entry) return "";
+      if (entry.type === "flow")
+        return activeId ? `#${FLOW_SLUG}/${activeId}` : `#${FLOW_SLUG}`;
+      return `#${entry.slug}`;
+    },
+    [entries],
+  );
+
   const initial = parseHash();
   const [index, setIndex] = useState(initial.index);
   const [activeId, setActiveId] = useState(initial.activeId);
 
-  const entry = ENTRIES[index];
+  const entry = entries[index];
   const inFlow = entry?.type === "flow";
 
   function navigateTo(target) {
     setActiveId(null);
-    setIndex(Math.max(0, Math.min(target, ENTRIES.length - 1)));
+    setIndex(Math.max(0, Math.min(target, entries.length - 1)));
   }
 
   useEffect(() => {
@@ -73,7 +96,7 @@ export default function App() {
         if (e.key === "Escape" || e.key === "Home") {
           // First Esc/Home returns the flow to overview; a second exits forward.
           if (activeId) setActiveId(null);
-          else setIndex((i) => Math.min(i + 1, ENTRIES.length - 1));
+          else setIndex((i) => Math.min(i + 1, entries.length - 1));
           return;
         }
         const idx = activeId ? STEP_IDS.indexOf(activeId) : -1;
@@ -82,7 +105,7 @@ export default function App() {
           if (idx >= STEP_IDS.length - 1) {
             // Past the last node: leave the flow forward.
             setActiveId(null);
-            setIndex((i) => Math.min(i + 1, ENTRIES.length - 1));
+            setIndex((i) => Math.min(i + 1, entries.length - 1));
           } else {
             setActiveId(STEP_IDS[idx + 1]);
           }
@@ -100,7 +123,7 @@ export default function App() {
         if (forward) {
           e.preventDefault();
           setActiveId(null);
-          setIndex((i) => Math.min(i + 1, ENTRIES.length - 1));
+          setIndex((i) => Math.min(i + 1, entries.length - 1));
         } else if (back) {
           e.preventDefault();
           setActiveId(null);
@@ -110,7 +133,7 @@ export default function App() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [inFlow, activeId]);
+  }, [inFlow, activeId, entries.length]);
 
   // Reflect the current location in the URL hash. replaceState keeps the URL
   // shareable without pushing a history entry for every step, and preserves the
@@ -118,8 +141,12 @@ export default function App() {
   useEffect(() => {
     const desired = locationToHash(index, activeId);
     if (desired === window.location.hash) return;
-    window.history.replaceState(null, "", desired || window.location.pathname);
-  }, [index, activeId]);
+    window.history.replaceState(
+      null,
+      "",
+      desired || window.location.pathname + window.location.search,
+    );
+  }, [index, activeId, locationToHash]);
 
   // Sync state when the hash changes externally (opened link, manual edit, back/forward).
   useEffect(() => {
@@ -130,7 +157,7 @@ export default function App() {
     }
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
+  }, [parseHash]);
 
   return (
     <div className="slideshow">
@@ -144,6 +171,10 @@ export default function App() {
             aria-hidden="true"
           />
         )}
+        {/* Return to the variant picker to switch talks (keyboard reachable). */}
+        <button type="button" className="deck-to-picker" onClick={backToPicker}>
+          Pick a talk
+        </button>
         {inFlow ? (
           <>
             <p className="sl-label flow-label">
@@ -169,7 +200,7 @@ export default function App() {
         )}
 
         <nav className="slide-dots">
-          {ENTRIES.map((e, i) => (
+          {entries.map((e, i) => (
             <button
               key={i}
               className="slide-dot"
