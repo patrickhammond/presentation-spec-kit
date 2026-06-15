@@ -1,47 +1,39 @@
-# Audience, Format, and Goals
+# Audience, Format, and Goals – Index
 
-The canonical reference for who this talk is for and what it needs to achieve. Read this before doing any slide or script work; every content decision should trace back to it.
+This talk is delivered to more than one room, in more than one length. Each room has its own
+audience profile, and each maps to a **deck variant** (architecture C: one source, many
+variants, selected by `?variant=` / config). **Read the profile for the variant you are
+working on before any slide or script work**; every content decision should trace back to it.
 
-## Who is in the room
+## Variants
 
-- ~40 people at Ingage.
-- **Mostly mature, experienced software development consultants.** Assume deep SDLC fluency. Do not explain basics, and do not use framing that reads as junior (no "vibe coding," no demo-gone-wrong tropes).
-- **Plus org admins through project-delivery staff.** A meaningful slice are non-developers. They should still be able to follow the whole workflow, because it maps onto a project lifecycle they already run.
+| Variant slug | Audience profile                                               | Room                                 | Length        | Live demo         | Status                       |
+| ------------ | -------------------------------------------------------------- | ------------------------------------ | ------------- | ----------------- | ---------------------------- |
+| `gdg`        | [`audience-gdg-cincinnati.md`](audience-gdg-cincinnati.md)     | GDG Cincinnati (community, all devs) | ~40 min + Q&A | 1–2 (centerpiece) | **primary / in development** |
+| `ingage`     | [`audience-ingage-lightning.md`](audience-ingage-lightning.md) | Ingage (internal, mixed)             | 7–8 min       | none              | delivered (archived)         |
+| `client`     | [`audience-client.md`](audience-client.md)                     | per engagement                       | TBD           | TBD               | template                     |
 
-This mixed makeup is the central design constraint: the talk has to land for someone who writes the code _and_ someone who scopes and delivers the work. The "you already do this" recognition beat is what serves both at once.
+## Which to read
 
-## Format
+- **Default / current work:** [`audience-gdg-cincinnati.md`](audience-gdg-cincinnati.md). The GDG talk is the primary target and the superset the others draw from.
+- **Maintaining the original lightning talk:** [`audience-ingage-lightning.md`](audience-ingage-lightning.md).
+- **Prepping a new client talk:** copy [`audience-client.md`](audience-client.md).
 
-- Lightning talk: **7–8 minutes of content + 2–3 minutes Q&A.**
-- Brisk delivery is fine and expected. Favor smaller, punchier slides the room reads in a glance over dense slides talked over.
-- **No live demo, deliberately.** The people who would benefit from one are already comfortable with `uvx`; the install one-liner lives on the closing "What's Next?" slide as a pointer, not a walkthrough.
-- Target **16:10** (1920×1200). Design for humans scanning a projected screen, not a developer at a desk.
-- The deck is also shared afterward (pushed to GitHub), so it doubles as a self-guided, interactive leave-behind.
+## Why this is split
 
-## Goal
+The Ingage and GDG rooms differ on the constraints that actually drive content: room makeup
+(mixed vs. all-dev), length (8 min vs. 40), and whether there is a live demo. Keeping one
+`audience.md` forced those into a single profile. Splitting per variant lets each talk be
+refined independently while all variants stay on the main line of development (no per-talk
+branches), which is the same motivation behind the config-driven deck variants.
 
-Create **curiosity, awareness, and familiarity**, so people feel comfortable taking a next step and can place Spec Kit in the wider ecosystem. **This is not a how-to.** It is a "you already understand this, here is where it fits" talk.
+## Shared, cross-variant principles
 
-## Success criteria
+These hold regardless of room (details and rationale live in the per-variant files and in
+[`../CLAUDE.md`](../CLAUDE.md)):
 
-Any one of these is a win:
-
-- People feel curious to keep the conversation going about this and other AI techniques.
-- People take a first step on their own.
-- People understand the value tools like this bring to their work.
-
-## What this implies for the content
-
-- **Lead with recognition.** The "this is just the SDLC, with executable artifacts" moment is the hook for an SDLC-literate, mildly skeptical crowd. It earns the right to make any payoff claim.
-- **Two doors for the next step.** Developers: run the init. Non-developers: read a real `spec.md` and see it is just a PRD with acceptance criteria. Do not pitch the next step at developers only.
-- **Place it in the ecosystem.** "Understand where it fits" is an explicit goal, so the close names the landscape (Spec Kit / OpenSpec / Kiro) rather than leaving it to Q&A.
+- **Lead with recognition.** "This is the SDLC you already run, with executable artifacts" is the hook that earns the right to any payoff claim. Its weight varies by room.
+- **Cadence.** Smaller, punchier slides that read in a glance beat dense slides talked over. One idea per slide, large type, near-zero reading load.
+- **Place it in the ecosystem.** Name the landscape (Spec Kit / OpenSpec / Kiro); do not leave "where it fits" to Q&A.
 - **End on curiosity.** Open questions invite the conversation to continue better than a summary or a "Questions?" slide.
-
-## Leave-behind design implications
-
-The deck is shared after the talk as a GitHub repo link (one link that serves both "where to learn more" and "get the deck"). This makes the interactive flow a self-guided artifact, not just a stage prop. Two constraints follow:
-
-- **Per-node `pts` must be self-explanatory without narration.** Someone clicking through solo has no speaker. Write talking points so they stand alone as complete thoughts, not as prompts for a speaker to riff from.
-- **The "want the deck, it is interactive" offer is made verbally on stage** at the close. The on-slide note was dropped to keep the closing "What's Next?" slide uncluttered; the repo link there still does double duty (learn more / get the deck), and the spoken offer remains the curiosity hook.
-
-The implication for live delivery: detail you cut from the spoken talk is not lost; it lives in the leave-behind. You can narrate lightly and let the copy carry the depth.
+- **Leave-behind discipline.** The deck is shared as a GitHub repo link afterward, so flow `pts` must stand alone without narration and the repo link does double duty (learn more / get the deck).
