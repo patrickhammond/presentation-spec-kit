@@ -94,6 +94,11 @@ specify init <project>
 ```
 
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+
+Active feature: Variant Picker. Plan and design artifacts:
+`specs/001-variant-picker/plan.md` (with research.md, data-model.md,
+contracts/, quickstart.md). For additional context about technologies,
+project structure, and conventions, read that plan and the constitution
+at `.specify/memory/constitution.md`.
+
 <!-- SPECKIT END -->
