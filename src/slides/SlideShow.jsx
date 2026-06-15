@@ -3,6 +3,7 @@
 // "only export components" rule (as the old SLIDE_SLUGS export did); fast-refresh
 // of a single slide is not worth splitting the deck across files.
 /* eslint-disable react-refresh/only-export-components */
+import { Fragment } from "react";
 
 // ── Primitives ──────────────────────────────────────────────────────────────
 
@@ -24,16 +25,14 @@ function Label({ n, title }) {
 // slides receive it as the `section` prop and the manifest supplies the value.
 // Per-variant copy differences are passed as props too (see byline / close).
 
+// taglineLines is plain data (array of strings) so the manifest can vary the
+// byline per variant without JSX in the data file. Lines render stacked.
 function TitleSlide({
-  tagline = (
-    <>
-      Structured requirements an agent can act on.
-      <br />
-      Results that land closer to done.
-      <br />
-      Fits how we already work.
-    </>
-  ),
+  taglineLines = [
+    "Structured requirements an agent can act on.",
+    "Results that land closer to done.",
+    "Fits how we already work.",
+  ],
 }) {
   return (
     <div className="slide slide--center slide--title">
@@ -43,7 +42,14 @@ function TitleSlide({
         className="sl-logo-hero"
       />
       <h1 className="sl-h1 sl-h1--hero">Understanding Spec&nbsp;Kit</h1>
-      <p className="sl-tagline">{tagline}</p>
+      <p className="sl-tagline">
+        {taglineLines.map((line, i) => (
+          <Fragment key={i}>
+            {i > 0 && <br />}
+            {line}
+          </Fragment>
+        ))}
+      </p>
     </div>
   );
 }
@@ -252,9 +258,13 @@ function WhereToStartSlide({ section }) {
 // previous slide and turns them into an invitation to keep talking. This is the
 // load-bearing beat (see docs/speaker-notes.md → closing guardrails). The
 // invite line varies per variant (internal Slack vs. community), so it is a prop.
-function WhatsNextSlide({
-  section,
-  invite = (
+// The default (ingage) invite keeps its inline emphasis. A variant can override
+// with plain-string `inviteLines` from the manifest (e.g. the community close,
+// which must not point at the internal Slack channel).
+function WhatsNextSlide({ section, inviteLines }) {
+  const body = inviteLines ? (
+    inviteLines.map((line, i) => <p key={i}>{line}</p>)
+  ) : (
     <>
       <p>
         If you’re poking at any of this, <em>I want to compare notes.</em>
@@ -263,13 +273,84 @@ function WhatsNextSlide({
         Let’s pick it up in our <em>#ai-practitioners</em> Slack channel.
       </p>
     </>
-  ),
-}) {
+  );
   return (
     <div className="slide">
       <Label n={section} title="What’s Next?" />
       <h1 className="sl-h1">Let’s keep talking.</h1>
-      <div className="sl-invite">{invite}</div>
+      <div className="sl-invite">{body}</div>
+    </div>
+  );
+}
+
+// ── GDG-only slides (community 40-min variant) ───────────────────────────────
+// Added for the gdg arc; not used by the ingage lightning talk. See
+// docs/audience-gdg-cincinnati.md and CLAUDE.md (gdg arc).
+
+// Intro / who-am-I. Placeholder copy for now (props let the manifest or a later
+// pass fill in real details). Unnumbered: it sits before the section counter.
+function WhoAmISlide({
+  name = "[Your name]",
+  role = "[Your role], Ingage",
+  points = [
+    "[How long you’ve been building software]",
+    "[How you started using Spec-Driven Development]",
+    "[Why this matters to you, and what you’re hoping to share]",
+  ],
+}) {
+  return (
+    <div className="slide">
+      <p className="sl-tagline">Hi, I’m</p>
+      <h1 className="sl-h1">{name}.</h1>
+      <p className="sl-body">{role}</p>
+      <ul className="sl-bullets">
+        {points.map((p, i) => (
+          <li key={i}>{p}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// "Time for the demo" transition. The screen switches to a terminal after this;
+// keep it a single, punchy beat.
+function DemoSlide({ section }) {
+  return (
+    <div className="slide">
+      <Label n={section} title="Time for a Demo" />
+      <h1 className="sl-h1">Let’s build it live.</h1>
+      <p className="sl-body">
+        We’ll add a real feature to <em className="sl-em">this very deck</em>{" "}
+        with Spec Kit, and let an agent write the code.
+      </p>
+      <p className="sl-body">
+        Watch the <em className="sl-em">constitution</em> keep it in line.
+      </p>
+    </div>
+  );
+}
+
+// Practitioner "what I've learned" beat: honest lessons that stuck. Distinct
+// from the open questions on the next slide. One bolded standout.
+function LessonsSlide({ section }) {
+  return (
+    <div className="slide">
+      <Label n={section} title="What I’ve Learned" />
+      <h1 className="sl-h1">A few things that actually stuck.</h1>
+      <ul className="sl-bullets">
+        <li>
+          I catch more bugs in <em className="sl-em">spec review</em> than code
+          review now.
+        </li>
+        <li>A tight constitution earns its keep. A vague one gets ignored.</li>
+        <li>
+          The optional commands, clarify and analyze, are where the quality
+          hides.
+        </li>
+        <li>
+          <strong>Small, sharp specs beat big ones the agent skims.</strong>
+        </li>
+      </ul>
     </div>
   );
 }
@@ -282,11 +363,14 @@ function WhatsNextSlide({
 
 export const SLIDE_REGISTRY = {
   title: TitleSlide,
+  whoami: WhoAmISlide,
   requirements: RequirementsSlide,
   hook: HookSlide,
   sdd: SddSlide,
   specKit: SpecKitSlide,
+  demo: DemoSlide,
   why: PredictabilitySlide,
+  lessons: LessonsSlide,
   honestClose: HonestCloseSlide,
   whereToStart: WhereToStartSlide,
   whatsNext: WhatsNextSlide,

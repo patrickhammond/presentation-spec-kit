@@ -19,6 +19,8 @@ The talk has two deliverables, presented as one combined slideshow (`src/App.jsx
    8. **What Am I Still Figuring Out?** – honest close: nothing here is new, what's new is trusting an agent with it; still learning how it holds up over time. Ends on a list of genuinely open questions, the last one bolded as the standout (multiple-perspective spec review). (Interrogative label; single-column, no two-stack.)
    9. **Where to start?** – the "go do it" half of the former combined close: heading "Your turn." (pays off the "workflow you already do" thesis), repo link (`https://github.com/github/spec-kit`), and the install one-liner chip. Developer-facing; the ecosystem nod lives on the SDD slide, not here.
    10. **What's Next?** – the close, on its own slide: the explicit ask. Heading "Let's keep talking."; picks up the open questions from the previous slide and turns them into the invite to keep the conversation going in the team `#ai-practitioners` Slack channel. This is the load-bearing closing beat (see `docs/speaker-notes.md` → closing guardrails). Deliberately holds just the ask, with no competing repo/install block.
+       **`gdg` arc** (~40 min community talk, `?variant=gdg`) is a superset of the above: it adds an **unnumbered who-am-I intro** after the title (placeholder copy, props let you fill it in), a **"Time for a Demo"** transition (section 5, the live meta-demo centerpiece, after the flow), and a **"What I've Learned"** practitioner beat (section 7, lessons that stuck, distinct from the open-questions slide). It re-points the close to a **community invite** (plain-string `inviteLines` prop, no internal Slack) and the title byline to "Fits how you already work" (`taglineLines` prop). Sections renumber to 1-10. New components (`whoami`, `demo`, `lessons`) live in `SlideShow.jsx`; per-variant copy is plain-data props from the manifest (no JSX in `variants.js`).
+
 2. **Interactive flow visual** – a React Flow node graph of the Spec Kit workflow, shown on stage and self-guided in the shared copy.
 
 The core thesis: _Spec Kit isn't a new methodology. It's the development lifecycle you already know, except requirements, design, and tickets become executable inputs for an AI agent instead of documents that rot in a wiki._
@@ -94,6 +96,8 @@ specify init <project>
 ```
 
 <!-- SPECKIT START -->
+
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
+
 <!-- SPECKIT END -->

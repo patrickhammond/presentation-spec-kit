@@ -19,9 +19,9 @@
 
 export const DEFAULT_VARIANT = "ingage";
 
-// The current shared arc. Both variants reference it today; `gdg` diverges in a
-// later content pass (intro / who-am-I, "time for the demo", expanded close).
-const baseArc = [
+// The ingage lightning arc (7-8 min, delivered). Section counter starts at the
+// Hook; title and the requirements creed are unnumbered.
+const ingageArc = [
   { type: "slide", id: "title", slug: "title" },
   { type: "slide", id: "requirements", slug: "quote-requirements" },
   { type: "slide", id: "hook", slug: "whats-the-problem", section: 1 },
@@ -44,15 +44,67 @@ const baseArc = [
   { type: "slide", id: "whatsNext", slug: "whats-next", section: 8 },
 ];
 
+// The GDG Cincinnati arc (~40 min community talk, all-dev). Superset of the
+// lightning arc: adds an intro/who-am-I, a "time for the demo" transition (the
+// centerpiece), and a practitioner "what I've learned" beat; re-points the close
+// to a community invite (no internal Slack); sections renumber accordingly.
+// Per-variant copy is plain-data props (no JSX in this data module).
+const gdgArc = [
+  {
+    type: "slide",
+    id: "title",
+    slug: "title",
+    props: {
+      taglineLines: [
+        "Structured requirements an agent can act on.",
+        "Results that land closer to done.",
+        "Fits how you already work.",
+      ],
+    },
+  },
+  { type: "slide", id: "whoami", slug: "who-am-i" },
+  { type: "slide", id: "requirements", slug: "quote-requirements" },
+  { type: "slide", id: "hook", slug: "whats-the-problem", section: 1 },
+  { type: "slide", id: "sdd", slug: "whats-sdd", section: 2 },
+  { type: "slide", id: "specKit", slug: "whats-spec-kit", section: 3 },
+  {
+    type: "flow",
+    slug: "spec-kit-flow",
+    section: 4,
+    label: "What’s The Process?",
+  },
+  { type: "slide", id: "demo", slug: "demo", section: 5 },
+  { type: "slide", id: "why", slug: "why-should-i-care", section: 6 },
+  { type: "slide", id: "lessons", slug: "what-ive-learned", section: 7 },
+  {
+    type: "slide",
+    id: "honestClose",
+    slug: "what-am-i-still-figuring-out",
+    section: 8,
+  },
+  { type: "slide", id: "whereToStart", slug: "where-to-start", section: 9 },
+  {
+    type: "slide",
+    id: "whatsNext",
+    slug: "whats-next",
+    section: 10,
+    props: {
+      inviteLines: [
+        "If you’re building with any of this, I want to hear how it goes.",
+        "Find me after, or at [your handle / contact].",
+      ],
+    },
+  },
+];
+
 export const VARIANTS = {
   ingage: {
     label: "Ingage Lightning Talk",
-    entries: baseArc,
+    entries: ingageArc,
   },
   gdg: {
     label: "GDG Cincinnati",
-    // Transitional: mirrors the lightning arc until the GDG content pass.
-    entries: baseArc,
+    entries: gdgArc,
   },
 };
 
