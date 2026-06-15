@@ -92,3 +92,8 @@ Install commands for the closing "What's Next?" slide (rendered as the light `.s
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 specify init <project>
 ```
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
