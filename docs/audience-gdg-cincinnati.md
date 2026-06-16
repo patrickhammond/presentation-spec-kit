@@ -17,7 +17,7 @@ the reusable client template is [`audience-client.md`](audience-client.md). Inde
 ## Format
 
 - **~40 minutes + Q&A.** Roughly 5x the lightning talk. Pace can slow down; the lightning talk was tight with fast talking, this one breathes.
-- **1–2 live demos**, with the demo as the centerpiece (see [`demo.md`](demo.md) once written). The Ingage "no live demo, deliberately" rule is **reversed** here.
+- **1–2 live demos**, with the demo as the centerpiece (runbook: [`demo.md`](demo.md)). The Ingage "no live demo, deliberately" rule is **reversed** here.
 - New structural slides this variant adds: an **intro / who-am-I** slide and a **"time for the demo"** transition slide (and a way back out of the demo).
 - Target **16:10** (1920×1200), same projected-screen design discipline.
 - Shared afterward as a GitHub repo link; the deck doubles as a self-guided, interactive leave-behind, same as Ingage.
