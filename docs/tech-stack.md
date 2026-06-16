@@ -30,9 +30,11 @@ npm run lint      # eslint .
 ```
 src/
   main.jsx              # React entry; mounts <App>, imports index.css
-  App.jsx               # reads ?variant=, renders the active variant's manifest; keyboard/dot nav; flow is an entry
-  index.css             # ALL styling (slides + flow), single global stylesheet
+  App.jsx               # resolves ?variant=: known -> deck (manifest + nav); none/unknown -> picker
+  index.css             # ALL styling (slides + flow + picker), single global stylesheet
   App.css               # vestigial Vite-default styles, unused by the app
+  picker/
+    VariantPicker.jsx   # variant picker landing screen (lists variants from the manifest)
   slides/
     SlideShow.jsx       # slide components + SLIDE_REGISTRY (id -> component)
   flow/
@@ -51,6 +53,6 @@ src/
 - **Single source of truth for flow content** is `src/data/steps.js` (`STEPS` array + `TIER_META`). Edit content there, not in the node components.
 - **All styling lives in `src/index.css`** as plain CSS with `vmin`-based responsive sizing. No CSS modules, no Tailwind.
 - **Fonts** load via a Google Fonts `@import` at the top of `index.css`: Sora, Heebo, IBM Plex Mono, and Caveat (the handwritten annotation face).
-- **Per-variant deck manifest** is `src/data/variants.js` (`VARIANTS`, `DEFAULT_VARIANT`, `resolveVariant`). Each variant is an ordered list of entries (`type: "slide"` with `id`/`slug`/`section`/`props`, or `type: "flow"`). This is the single source of truth for which slides appear, in what order, with what section counter and slug. Slide components are registered by `id` in `SLIDE_REGISTRY` (`src/slides/SlideShow.jsx`). Add or reorder slides here, not by editing nav math.
-- **Variant selection.** The active variant is read from the `?variant=` query param at load time in `App.jsx` (falling back to `DEFAULT_VARIANT`). The in-deck location lives in the URL hash, so variant + spot is shareable (e.g. `/?variant=ingage#whats-sdd`). Nav (`App.jsx`) iterates the active variant's `entries`; the flow is just an entry, so there is no special flow-index math.
-- **Deep-linkable URL hash.** `App.jsx` mirrors the current location into the URL hash so any spot is shareable: no hash is the title, `#whats-the-problem` / `#whats-sdd` / etc. are slides by slug, `#spec-kit-flow` is the flow overview, and `#spec-kit-flow/<stepId>` (e.g. `#spec-kit-flow/analyze`) opens the flow focused on a node. Slugs come from the exported `SLIDE_SLUGS` array in `SlideShow.jsx`, which must stay in the same order as the slides array. Node ids come from `STEP_IDS` in `steps.js`. The hash is written with `replaceState` (no history spam) and a `hashchange` listener syncs state for opened or hand-edited links.
+- **Per-variant deck manifest** is `src/data/variants.js` (`VARIANTS`, `DEFAULT_VARIANT`, `isKnownVariant`, `resolveVariant`). Each variant has a `label`, a `meta` object (`room`/`length`/`demo`, read by the picker), and `entries`: an ordered list (`type: "slide"` with `id`/`slug`/`section`/`props`, or `type: "flow"`). This is the single source of truth for which slides appear, in what order, with what section counter and slug, plus how the picker describes each variant. Slide components are registered by `id` in `SLIDE_REGISTRY` (`src/slides/SlideShow.jsx`). Add or reorder slides here, not by editing nav math; add a variant here and it appears in the picker automatically.
+- **Variant selection + picker.** `App.jsx` reads `?variant=` at load: a known key opens that deck directly; no variant or an unknown one shows the variant picker (`src/picker/VariantPicker.jsx`) instead of silently defaulting (see `specs/001-variant-picker/`). `DEFAULT_VARIANT`/`resolveVariant` remain for callers that want a guaranteed variant, but the load path uses `isKnownVariant`. The in-deck location lives in the URL hash, so variant + spot is shareable (e.g. `/?variant=ingage#whats-sdd`). Selecting in the picker sets `?variant=`; a "Pick a talk" control returns to it. Deck nav iterates the active variant's `entries`; the flow is just an entry, so there is no special flow-index math.
+- **Deep-linkable URL hash.** The `Deck` in `App.jsx` mirrors the current location into the URL hash so any spot is shareable: no hash is the title, `#whats-the-problem` / `#whats-sdd` / etc. are slides by slug, `#spec-kit-flow` is the flow overview, and `#spec-kit-flow/<stepId>` (e.g. `#spec-kit-flow/analyze`) opens the flow focused on a node. Slugs come from the active variant's `entries` in `variants.js`. Node ids come from `STEP_IDS` in `steps.js`. The hash is written with `replaceState` (no history spam) and a `hashchange` listener syncs state for opened or hand-edited links.

@@ -8,7 +8,7 @@ This is a talk about Spec Kit (Spec-Driven Development), delivered as **multiple
 
 The talk has two deliverables, presented as one combined slideshow (`src/App.jsx` interleaves them):
 
-1. **Slides** – slide components live in `src/slides/SlideShow.jsx` (exported via `SLIDE_REGISTRY`), but **which slides appear, in what order, with what section number and URL slug is driven per variant by the manifest in [`src/data/variants.js`](src/data/variants.js)**, not hardcoded. The active variant is chosen by the `?variant=` query param (default `ingage`); the interactive flow is a manifest entry (`type: "flow"`), not a numbered slide. Section numbers (`section` prop) and per-variant copy (props) come from the manifest. Current `ingage` arc:
+1. **Slides** – slide components live in `src/slides/SlideShow.jsx` (exported via `SLIDE_REGISTRY`), but **which slides appear, in what order, with what section number and URL slug is driven per variant by the manifest in [`src/data/variants.js`](src/data/variants.js)**, not hardcoded. The active variant is chosen by the `?variant=` query param; with no (or an unknown) variant the app shows the variant picker (`src/picker/VariantPicker.jsx`) rather than silently defaulting. The interactive flow is a manifest entry (`type: "flow"`), not a numbered slide. Section numbers (`section` prop) and per-variant copy (props) come from the manifest. Current `ingage` arc:
    1. **Title** – hero headline "Understanding Spec Kit", byline carries the story in three beats: "Structured requirements an agent can act on. Results that land closer to done. Fits how you already work." (reframe → payoff → recognition). No kicker. The recognition beat ("the lifecycle you already run") lives on the creed/SDD slides rather than crowding the cover. Replaces the old anxiety framing ("Shipping code you didn't write"), which duplicated the Hook and excluded the non-dev half of the room.
    2. **Requirements creed** – unnumbered epigraph / cold open ("Don't start coding until we understand the requirements." – every senior dev, eventually). Anchors the talk in a discipline the room already knows, before the Hook reframes it for the AI era. No `Label`: the section counter starts at the Hook.
    3. **Hook** – the problem, framed as drift/rework: "Speed isn't the problem. Drift is." An agent builds fast but can drift from intent; the distance between what you intended and what got built is where surprises and rework hide. Echoes the Why Should I Care? payoff ("Less rework. Fewer surprises.") on purpose, and ends on the bridge bold "Spec-Driven Development closes that gap." (The earlier trust/traceability framing – "You didn't write it. Now you have to trust it." – was cut: it set up a "trust" payoff the talk never resolves and re-centered the code-reader on a slide the mixed room needs to stay with.) No "vibe coding" framing.
@@ -97,7 +97,9 @@ specify init <project>
 
 <!-- SPECKIT START -->
 
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+For project structure, conventions, and the variant system, read
+`docs/tech-stack.md` and the constitution at `.specify/memory/constitution.md`.
+`specs/001-variant-picker/` is a complete worked example of the Spec Kit flow
+(spec, plan, tasks, contracts) for the talk's live demo.
 
 <!-- SPECKIT END -->
