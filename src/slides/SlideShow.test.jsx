@@ -72,4 +72,14 @@ describe("SlideShow – WCAG & copy-rule checks", () => {
     expect(indexCss).toContain("prefers-reduced-motion");
     expect(indexCss).toContain("reduce");
   });
+
+  // Regression: an empty inviteLines array must fall back to the default invite,
+  // not render the load-bearing closing slide with a blank body.
+  it("WhatsNext falls back to the default invite for empty inviteLines", () => {
+    const WhatsNext = SLIDE_REGISTRY.whatsNext;
+    const { container } = render(<WhatsNext section={8} inviteLines={[]} />);
+    expect(container.querySelector(".sl-invite").textContent.trim()).not.toBe(
+      "",
+    );
+  });
 });

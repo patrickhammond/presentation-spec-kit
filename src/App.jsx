@@ -12,10 +12,12 @@ function readVariantParam() {
 }
 
 // Choosing a variant reflects it in the URL; the reload enters deck mode at the
-// first slide (no hash). The variant is fixed for the session, so switching is a
-// reload, consistent with how variant resolution already works.
+// first slide. We navigate to the bare path + query (no fragment) so any stale
+// in-deck hash on the picker URL is dropped and the deck opens at the title. The
+// variant is fixed for the session, so switching is a reload, consistent with
+// how variant resolution already works.
 function selectVariant(key) {
-  window.location.search = `?variant=${encodeURIComponent(key)}`;
+  window.location.href = `${window.location.pathname}?variant=${encodeURIComponent(key)}`;
 }
 
 // Returning to the picker drops the variant (and any in-deck hash) so resolution
@@ -49,13 +51,17 @@ function Deck({ variantKey }) {
   const parseHash = useCallback(() => {
     const raw = window.location.hash.replace(/^#\/?/, "");
     if (!raw) return { index: 0, activeId: null };
-    if (raw === FLOW_SLUG) return { index: flowIndex, activeId: null };
-    if (raw.startsWith(`${FLOW_SLUG}/`)) {
-      const id = raw.slice(FLOW_SLUG.length + 1);
-      return {
-        index: flowIndex,
-        activeId: STEP_IDS.includes(id) ? id : null,
-      };
+    // Flow hashes only resolve if this variant actually has a flow entry;
+    // otherwise fall through to the slug lookup (which lands on the title).
+    if (flowIndex !== -1) {
+      if (raw === FLOW_SLUG) return { index: flowIndex, activeId: null };
+      if (raw.startsWith(`${FLOW_SLUG}/`)) {
+        const id = raw.slice(FLOW_SLUG.length + 1);
+        return {
+          index: flowIndex,
+          activeId: STEP_IDS.includes(id) ? id : null,
+        };
+      }
     }
     const idx = entries.findIndex((e) => e.slug === raw);
     return idx === -1
@@ -94,9 +100,11 @@ function Deck({ variantKey }) {
 
       if (inFlow) {
         if (e.key === "Escape" || e.key === "Home") {
-          // First Esc/Home returns the flow to overview; a second exits forward.
-          if (activeId) setActiveId(null);
-          else setIndex((i) => Math.min(i + 1, entries.length - 1));
+          // Esc/Home returns the flow to its overview (per CLAUDE.md interaction
+          // model). It never advances the deck, so pressing Esc to leave
+          // fullscreen does not also jump slides. To exit the flow, arrow back.
+          e.preventDefault();
+          setActiveId(null);
           return;
         }
         const idx = activeId ? STEP_IDS.indexOf(activeId) : -1;
@@ -171,10 +179,18 @@ function Deck({ variantKey }) {
             aria-hidden="true"
           />
         )}
-        {/* Return to the variant picker to switch talks (keyboard reachable). */}
-        <button type="button" className="deck-to-picker" onClick={backToPicker}>
-          Pick a talk
-        </button>
+        {/* Return to the variant picker to switch talks (keyboard reachable).
+            Hidden on the flow, where the section label occupies the same
+            top-left corner; arrow back out of the flow to reach it. */}
+        {!inFlow && (
+          <button
+            type="button"
+            className="deck-to-picker"
+            onClick={backToPicker}
+          >
+            Pick a talk
+          </button>
+        )}
         {inFlow ? (
           <>
             <p className="sl-label flow-label">
@@ -207,7 +223,13 @@ function Deck({ variantKey }) {
               data-active={i === index || undefined}
               onClick={() => navigateTo(i)}
               aria-label={
-                e.type === "flow" ? "Interactive Flow" : `Slide ${i + 1}`
+                e.type === "flow"
+                  ? "Interactive flow"
+                  : e.section
+                    ? `Section ${e.section}`
+                    : e.slug === "title"
+                      ? "Title"
+                      : e.slug.replace(/-/g, " ")
               }
             />
           ))}

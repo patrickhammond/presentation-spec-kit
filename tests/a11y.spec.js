@@ -1,19 +1,23 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// Mirror SLIDE_SLUGS from SlideShow.jsx — keep in sync when slides change.
+// Mirror the ingage variant slide slugs from src/data/variants.js (ingageArc).
+// Keep in sync when that arc changes. The deck now requires a ?variant=; with
+// none it shows the variant picker, so every nav pins ?variant=ingage.
 const SLIDE_SLUGS = [
   "title",
-  "requirements",
-  "hook",
-  "sdd",
-  "spec-kit",
-  "benefits",
-  "honest-close",
+  "quote-requirements",
+  "whats-the-problem",
+  "whats-sdd",
+  "whats-spec-kit",
+  "why-should-i-care",
+  "what-am-i-still-figuring-out",
+  "where-to-start",
   "whats-next",
-  "learn-more",
-  "qa-backup",
 ];
+
+// Build a deck URL for the ingage variant, optionally at an in-deck hash.
+const deckUrl = (hash) => `/?variant=ingage${hash ? `#${hash}` : ""}`;
 
 // At 1920×1080 (viewport set in playwright.config.js), vmin = 10.8px.
 // Thresholds come from docs/accessibility.md.
@@ -32,7 +36,7 @@ async function fontSize(page, selector) {
 // ── Slides ──────────────────────────────────────────────────────────────────
 
 for (const slug of SLIDE_SLUGS) {
-  const url = slug === "title" ? "/" : `/#${slug}`;
+  const url = slug === "title" ? deckUrl() : deckUrl(slug);
 
   test(`slide:${slug} — no axe violations`, async ({ page }) => {
     await page.goto(url);
@@ -82,7 +86,7 @@ for (const slug of SLIDE_SLUGS) {
 // ── Interactive flow ─────────────────────────────────────────────────────────
 
 test("flow — no axe violations (overview)", async ({ page }) => {
-  await page.goto("/#flow");
+  await page.goto(deckUrl("spec-kit-flow"));
   await page.waitForSelector(".react-flow");
 
   const results = await new AxeBuilder({ page })
@@ -97,7 +101,7 @@ test("flow — no axe violations (overview)", async ({ page }) => {
 });
 
 test("flow — no axe violations (detail panel open)", async ({ page }) => {
-  await page.goto("/#flow/specify");
+  await page.goto(deckUrl("spec-kit-flow/specify"));
   await page.waitForSelector(".detail-panel");
 
   const results = await new AxeBuilder({ page })
@@ -108,7 +112,7 @@ test("flow — no axe violations (detail panel open)", async ({ page }) => {
 });
 
 test("flow — detail panel font sizes meet minimums", async ({ page }) => {
-  await page.goto("/#flow/specify");
+  await page.goto(deckUrl("spec-kit-flow/specify"));
   await page.waitForSelector(".detail-panel");
 
   const cmd = await fontSize(page, ".detail-cmd");

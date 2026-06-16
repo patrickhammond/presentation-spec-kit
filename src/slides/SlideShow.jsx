@@ -262,7 +262,7 @@ function WhereToStartSlide({ section }) {
 // with plain-string `inviteLines` from the manifest (e.g. the community close,
 // which must not point at the internal Slack channel).
 function WhatsNextSlide({ section, inviteLines }) {
-  const body = inviteLines ? (
+  const body = inviteLines?.length ? (
     inviteLines.map((line, i) => <p key={i}>{line}</p>)
   ) : (
     <>
