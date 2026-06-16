@@ -7,37 +7,55 @@ import VariantPicker from "./picker/VariantPicker.jsx";
 
 const FLOW_SLUG = "spec-kit-flow";
 
-function readVariantParam() {
-  return new URLSearchParams(window.location.search).get("variant");
-}
-
-// Choosing a variant reflects it in the URL; the reload enters deck mode at the
-// first slide. We navigate to the bare path + query (no fragment) so any stale
-// in-deck hash on the picker URL is dropped and the deck opens at the title. The
-// variant is fixed for the session, so switching is a reload, consistent with
-// how variant resolution already works.
-function selectVariant(key) {
-  window.location.href = `${window.location.pathname}?variant=${encodeURIComponent(key)}`;
-}
-
-// Returning to the picker drops the variant (and any in-deck hash) so resolution
-// falls back to picker mode.
-function backToPicker() {
-  window.location.assign(window.location.pathname);
+// The active variant resolved from the URL: a known ?variant= key, else null
+// (which means "show the picker"). An unknown key resolves to null too, so a bad
+// link is recoverable rather than silently defaulting.
+function variantFromUrl() {
+  const key = new URLSearchParams(window.location.search).get("variant");
+  return isKnownVariant(key) ? key : null;
 }
 
 export default function App() {
-  const variantKey = readVariantParam();
-  // No variant, or an unknown one: show the picker rather than silently
-  // defaulting. A known variant goes straight into its deck, preserving the
-  // existing deep-link behavior (including the in-deck hash).
-  if (!isKnownVariant(variantKey)) {
-    return <VariantPicker onSelect={selectVariant} />;
+  // Variant lives in component state, so switching is an in-app transition (no
+  // full reload): instant, and it never re-downloads the bundle or re-inits the
+  // flow graph mid-talk. The URL is kept in sync for shareability + back/forward.
+  const [variantKey, setVariantKey] = useState(variantFromUrl);
+
+  // Switch into a deck: push a shareable URL (path + query, no fragment so the
+  // deck opens at the title) and update state.
+  function selectVariant(key) {
+    window.history.pushState(
+      null,
+      "",
+      `${window.location.pathname}?variant=${encodeURIComponent(key)}`,
+    );
+    setVariantKey(key);
   }
-  return <Deck variantKey={variantKey} />;
+
+  // Return to the picker: drop the variant (and any in-deck hash) from the URL.
+  function backToPicker() {
+    window.history.pushState(null, "", window.location.pathname);
+    setVariantKey(null);
+  }
+
+  // Browser back/forward across picker <-> deck transitions: re-resolve from URL.
+  useEffect(() => {
+    function onPop() {
+      setVariantKey(variantFromUrl());
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  if (!variantKey) return <VariantPicker onSelect={selectVariant} />;
+  // Keying the deck on the variant remounts it on switch, so its in-deck
+  // location resets to the title (the pushed URL carries no hash).
+  return (
+    <Deck key={variantKey} variantKey={variantKey} onExit={backToPicker} />
+  );
 }
 
-function Deck({ variantKey }) {
+function Deck({ variantKey, onExit }) {
   const entries = VARIANTS[variantKey].entries;
   const flowIndex = entries.findIndex((e) => e.type === "flow");
 
@@ -183,11 +201,7 @@ function Deck({ variantKey }) {
             Hidden on the flow, where the section label occupies the same
             top-left corner; arrow back out of the flow to reach it. */}
         {!inFlow && (
-          <button
-            type="button"
-            className="deck-to-picker"
-            onClick={backToPicker}
-          >
+          <button type="button" className="deck-to-picker" onClick={onExit}>
             Pick a talk
           </button>
         )}

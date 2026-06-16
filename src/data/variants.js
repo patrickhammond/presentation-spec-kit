@@ -4,13 +4,16 @@
 // variant live in docs/audience-*.md; the index is docs/audience.md.
 //
 // Entry shapes:
-//   { type: "slide", id, slug, section?, props? }
+//   { type: "slide", id, slug, numbered?, props? }
 //     - `id` maps to a component in SLIDE_REGISTRY (src/slides/SlideShow.jsx)
-//     - `section` is the printed counter ("01" …); omit for unnumbered slides
-//       (title, epigraph)
+//     - `numbered: false` marks an unnumbered cold-open slide (title, creed,
+//       who-am-I); every other entry is numbered in order by withSections
 //     - `props` are passed to the slide component, for per-variant copy
-//   { type: "flow", slug, section, label }
-//     - the interactive React Flow block; has no slide component
+//   { type: "flow", slug, label }
+//     - the interactive React Flow block; has no slide component, but IS numbered
+//
+// Section counters are derived from position (withSections), not written by hand,
+// so inserting or reordering an entry renumbers the rest automatically.
 //
 // Selected at load time by the `?variant=` query param, validated against the
 // keys below via isKnownVariant. When no (or an unknown) variant is given, the
@@ -19,41 +22,75 @@
 
 export const DEFAULT_VARIANT = "ingage";
 
-// The ingage lightning arc (7-8 min, delivered). Section counter starts at the
-// Hook; title and the requirements creed are unnumbered.
-const ingageArc = [
-  { type: "slide", id: "title", slug: "title" },
-  { type: "slide", id: "requirements", slug: "quote-requirements" },
-  { type: "slide", id: "hook", slug: "whats-the-problem", section: 1 },
-  { type: "slide", id: "sdd", slug: "whats-sdd", section: 2 },
-  { type: "slide", id: "specKit", slug: "whats-spec-kit", section: 3 },
-  {
-    type: "flow",
-    slug: "spec-kit-flow",
-    section: 4,
-    label: "What’s The Process?",
-  },
-  { type: "slide", id: "why", slug: "why-should-i-care", section: 5 },
-  {
-    type: "slide",
-    id: "honestClose",
-    slug: "what-am-i-still-figuring-out",
-    section: 6,
-  },
-  { type: "slide", id: "whereToStart", slug: "where-to-start", section: 7 },
-  { type: "slide", id: "whatsNext", slug: "whats-next", section: 8 },
-];
+// Assign sequential section numbers ("01", "02" …) to numbered entries by
+// position, leaving `numbered: false` entries without a section. Returns fresh
+// objects so shared entry constants below are never mutated (and the `numbered`
+// marker is stripped from the result the app sees).
+function withSections(entries) {
+  let n = 0;
+  return entries.map(({ numbered, ...rest }) => {
+    if (numbered === false) return rest;
+    n += 1;
+    return { ...rest, section: n };
+  });
+}
+
+// Entries shared verbatim across variants (defined once). Title and What's Next
+// differ by per-variant props, so they are written inline in each arc; who-am-I,
+// the demo transition, and the lessons beat are gdg-only.
+const creed = {
+  type: "slide",
+  id: "requirements",
+  slug: "quote-requirements",
+  numbered: false,
+};
+const hook = { type: "slide", id: "hook", slug: "whats-the-problem" };
+const sdd = { type: "slide", id: "sdd", slug: "whats-sdd" };
+const specKit = { type: "slide", id: "specKit", slug: "whats-spec-kit" };
+const flow = {
+  type: "flow",
+  slug: "spec-kit-flow",
+  label: "What’s The Process?",
+};
+const why = { type: "slide", id: "why", slug: "why-should-i-care" };
+const honestClose = {
+  type: "slide",
+  id: "honestClose",
+  slug: "what-am-i-still-figuring-out",
+};
+const whereToStart = {
+  type: "slide",
+  id: "whereToStart",
+  slug: "where-to-start",
+};
+
+// The ingage lightning arc (7-8 min, delivered). Title and creed are unnumbered;
+// the section counter starts at the Hook (sections 1-8). What's Next uses the
+// component default invite (internal Slack).
+const ingageArc = withSections([
+  { type: "slide", id: "title", slug: "title", numbered: false },
+  creed,
+  hook,
+  sdd,
+  specKit,
+  flow,
+  why,
+  honestClose,
+  whereToStart,
+  { type: "slide", id: "whatsNext", slug: "whats-next" },
+]);
 
 // The GDG Cincinnati arc (~40 min community talk, all-dev). Superset of the
-// lightning arc: adds an intro/who-am-I, a "time for the demo" transition (the
-// centerpiece), and a practitioner "what I've learned" beat; re-points the close
-// to a community invite (no internal Slack); sections renumber accordingly.
-// Per-variant copy is plain-data props (no JSX in this data module).
-const gdgArc = [
+// lightning arc: adds an unnumbered who-am-I, a "time for the demo" transition
+// (the centerpiece), and a practitioner "what I've learned" beat; re-points the
+// close to a community invite (no internal Slack). Sections renumber to 1-10
+// automatically. Per-variant copy is plain-data props (no JSX in this module).
+const gdgArc = withSections([
   {
     type: "slide",
     id: "title",
     slug: "title",
+    numbered: false,
     props: {
       taglineLines: [
         "Structured requirements an agent can act on.",
@@ -66,6 +103,7 @@ const gdgArc = [
     type: "slide",
     id: "whoami",
     slug: "who-am-i",
+    numbered: false,
     props: {
       name: "Patrick Hammond",
       role: "Director at Ingage Partners. Co-founder and CTO at Atomic Robot.",
@@ -78,31 +116,20 @@ const gdgArc = [
       photoAlt: "Patrick Hammond",
     },
   },
-  { type: "slide", id: "requirements", slug: "quote-requirements" },
-  { type: "slide", id: "hook", slug: "whats-the-problem", section: 1 },
-  { type: "slide", id: "sdd", slug: "whats-sdd", section: 2 },
-  { type: "slide", id: "specKit", slug: "whats-spec-kit", section: 3 },
-  {
-    type: "flow",
-    slug: "spec-kit-flow",
-    section: 4,
-    label: "What’s The Process?",
-  },
-  { type: "slide", id: "demo", slug: "demo", section: 5 },
-  { type: "slide", id: "why", slug: "why-should-i-care", section: 6 },
-  { type: "slide", id: "lessons", slug: "what-ive-learned", section: 7 },
-  {
-    type: "slide",
-    id: "honestClose",
-    slug: "what-am-i-still-figuring-out",
-    section: 8,
-  },
-  { type: "slide", id: "whereToStart", slug: "where-to-start", section: 9 },
+  creed,
+  hook,
+  sdd,
+  specKit,
+  flow,
+  { type: "slide", id: "demo", slug: "demo" },
+  why,
+  { type: "slide", id: "lessons", slug: "what-ive-learned" },
+  honestClose,
+  whereToStart,
   {
     type: "slide",
     id: "whatsNext",
     slug: "whats-next",
-    section: 10,
     props: {
       inviteLines: [
         "If you’re building with any of this, I want to hear how it goes.",
@@ -110,7 +137,7 @@ const gdgArc = [
       ],
     },
   },
-];
+]);
 
 // Each variant also carries `meta` (room, length, demo) so the variant picker
 // can list and describe variants straight from this manifest. Source of truth
