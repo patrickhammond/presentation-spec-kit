@@ -297,17 +297,24 @@ function WhoAmISlide({
     "[How you started using Spec-Driven Development]",
     "[Why this matters to you, and what you’re hoping to share]",
   ],
+  photo,
+  photoAlt,
 }) {
   return (
-    <div className="slide">
-      <p className="sl-tagline">Hi, I’m</p>
-      <h1 className="sl-h1">{name}.</h1>
-      <p className="sl-body">{role}</p>
-      <ul className="sl-bullets">
-        {points.map((p, i) => (
-          <li key={i}>{p}</li>
-        ))}
-      </ul>
+    <div className="slide whoami">
+      {photo && (
+        <img className="whoami-photo" src={photo} alt={photoAlt || name} />
+      )}
+      <div className="whoami-text">
+        <p className="sl-tagline">Hi, I’m</p>
+        <h1 className="sl-h1">{name}.</h1>
+        <p className="sl-body">{role}</p>
+        <ul className="sl-bullets">
+          {points.map((p, i) => (
+            <li key={i}>{p}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

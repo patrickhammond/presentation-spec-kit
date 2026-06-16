@@ -62,7 +62,22 @@ const gdgArc = [
       ],
     },
   },
-  { type: "slide", id: "whoami", slug: "who-am-i" },
+  {
+    type: "slide",
+    id: "whoami",
+    slug: "who-am-i",
+    props: {
+      name: "Patrick Hammond",
+      role: "Director at Ingage Partners. Co-founder and CTO at Atomic Robot.",
+      points: [
+        "Co-organizer of GDG Cincinnati and Ohio DevFest.",
+        "Led the first Android mobile team at Kroger.",
+        "20+ years in, and having more fun building software than ever.",
+      ],
+      photo: "/img/patrick-hammond.jpg",
+      photoAlt: "Patrick Hammond",
+    },
+  },
   { type: "slide", id: "requirements", slug: "quote-requirements" },
   { type: "slide", id: "hook", slug: "whats-the-problem", section: 1 },
   { type: "slide", id: "sdd", slug: "whats-sdd", section: 2 },
@@ -91,7 +106,7 @@ const gdgArc = [
     props: {
       inviteLines: [
         "If you’re building with any of this, I want to hear how it goes.",
-        "Find me after, or at [your handle / contact].",
+        "Come find me, I help organize GDG Cincinnati and Ohio DevFest.",
       ],
     },
   },

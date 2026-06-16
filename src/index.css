@@ -1126,3 +1126,29 @@ kbd {
   color: #404850;
   line-height: 1.45;
 }
+
+/* ── Who am I (gdg intro) ─────────────────────────────────────────────────── */
+/*    Circular headshot beside the intro text. Row layout overriding .slide.    */
+.whoami {
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(24px, 5vmin, 64px);
+}
+.whoami-photo {
+  width: clamp(150px, 32vmin, 360px);
+  height: clamp(150px, 32vmin, 360px);
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 4px solid #ffffff;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.12);
+}
+.whoami-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  min-width: 0;
+}
+.whoami-text .sl-tagline {
+  margin-bottom: -0.1em;
+}
