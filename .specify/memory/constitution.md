@@ -1,50 +1,130 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+## Sync Impact Report
+
+**Version**: 0.0.0 → 1.0.0
+**Bump rationale**: MAJOR — initial fill from template; all placeholders replaced
+with concrete project-specific content for the first time.
+
+### Modified Principles
+- All six principles: placeholder tokens → concrete, testable rules (first-time fill)
+
+### Added Sections
+- Core Principles I–VI (all new)
+
+### Removed Sections
+- [SECTION_2_NAME] — omitted; six principles cover all governance surface without
+  additional constraint sections
+- [SECTION_3_NAME] — omitted; Definition of Done (Principle V) subsumes workflow
+  quality gates
+
+### Templates Requiring Updates
+- `.specify/templates/plan-template.md`: ✅ No change required — Constitution Check
+  section uses a generic placeholder filled dynamically by /speckit-plan; correct as-is.
+- `.specify/templates/spec-template.md`: ✅ No change required — FR-/SC-IDs appear
+  inside spec documents, not source code; outside Principle VI scope.
+- `.specify/templates/tasks-template.md`: ✅ No change required — T-IDs appear inside
+  task documents, not source code; outside Principle VI scope.
+
+### Follow-up TODOs
+- None; all placeholders resolved.
+-->
+
+# speckit-intro Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. No Inline Style Props
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All styling MUST live in `src/index.css`, keyed by class name. Per-render values
+(e.g., tier color, dynamic offset) MUST be passed as CSS custom properties
+(`style={{ "--var": value }}`) and consumed in the stylesheet. Inline `style`
+props with static values are never permitted.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: Inline styles silently override the cascade and scatter sizing,
+color, and font decisions across components. One stylesheet is the single source
+of truth for all visual properties.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Single Source of Truth
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+Slide order, section numbers, and URL slugs MUST come from `src/data/variants.js`.
+Flow content (steps, tiers, detail copy) MUST come from `src/data/steps.js`.
+Neither MUST be hardcoded in components or duplicated elsewhere.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Any hardcoded ordering or content creates silent drift between what
+the manifest says and what renders. All manifest-driven values must change in exactly
+one place.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Projector-Readable and Accessible
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+All audience-facing content MUST use `vmin`-scaled type. At 1080p, body text MUST
+render at ≥ 27px and headings at ≥ 54px. Contrast ratio MUST be ≥ 4.5:1 for anything
+the audience must read.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+The accessibility tests (contrast, font size) are a **gate**, not advisory. A change
+that fails these tests is not shippable regardless of visual intent.
+
+**Rationale**: This is a projected-screen presentation. Legibility is a hard constraint,
+not a preference. Audience members in the back row set the bar.
+
+### IV. Brand Voice in Audience-Facing Copy
+
+All audience-facing copy and typography MUST comply with `docs/ingage-brand.md` and
+`docs/copy-style.md`. Those documents are the authoritative source; this constitution
+does not restate their full rules.
+
+Non-negotiable minimums: no em dashes anywhere; curly apostrophes and quotes in all
+rendered copy; IBM Plex Mono reserved for section labels/titles and code only, never
+prose or UI copy.
+
+**Rationale**: Consistency across deck, flow detail panels, and shared copy is a brand
+deliverable. The docs are the SoT so rules can evolve in one place.
+
+### V. Definition of Done
+
+No change is done until all four commands pass locally:
+
+```
+npm run lint
+npm run format
+npm test
+npm run build
+```
+
+New behavior MUST ship with tests. Accessibility tests MUST pass. Visual or content
+changes MUST be sanity-checked against the affected slide or flow in the built bundle
+(`npm run preview`).
+
+**Rationale**: A green local gate prevents regressions from reaching the deck at the
+moment of presentation. "Looks right in dev" is not done.
+
+### VI. No Artifact IDs in Source
+
+Source code and inline comments MUST NOT cite spec, plan, or task identifiers
+(FR-, SC-, US-, R-, T-IDs). Traceability lives in the PR description and commit
+history, not inline.
+
+**Rationale**: Artifact IDs renumber as specs and plans evolve. Inline citations
+become stale noise that misleads future readers about intent and version history.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other coding and content practices for this
+repository. Any amendment requires:
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+1. A PR with the updated constitution and a clear rationale for the version bump.
+2. All dependent templates reviewed for alignment (see the Consistency Propagation
+   checklist in the `/speckit-constitution` skill).
+3. `LAST_AMENDED_DATE` updated to the date of the amendment; `CONSTITUTION_VERSION`
+   bumped per semantic versioning:
+   - MAJOR: a principle removed or redefined in a backward-incompatible way.
+   - MINOR: a new principle or section added, or guidance materially expanded.
+   - PATCH: clarifications, wording fixes, non-semantic refinements.
+
+All PRs and code reviews MUST verify compliance with Principles I–VI before merge.
+Complexity that would violate a principle requires explicit justification in the PR
+description (never inline in source).
+
+For runtime development guidance see `CLAUDE.md` (project-level) and the `docs/`
+folder (brand, copy, accessibility, speaker notes, audience profiles).
+
+**Version**: 1.0.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-06-17
