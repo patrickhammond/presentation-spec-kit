@@ -63,23 +63,43 @@ Confirm by typing `/speckit.` and seeing the eight commands.
 
 ## Phase 2 — `/speckit.constitution` (5 min, the beat that matters)
 
-Don't let it auto-generate generic fluff. Feed it the real house rules from `AGENTS.md`.
+Don't let it auto-generate generic fluff. Feed it the real house rules from `AGENTS.md`. Keep
+it to a handful of enforceable principles; delegate the fine-grained copy and typography rules
+to the docs rather than pasting every comma rule in. A constitution that lists every style
+detail is one nobody re-reads, and it's the AGENTS.md-as-junk-drawer anti-pattern the talk warns
+about.
 
 ```
 /speckit.constitution Derive the project constitution from AGENTS.md and the docs/ folder
-in this repo. The non-negotiable principles are: (1) No inline style props — all styling lives
-in src/index.css keyed by class; per-render values pass as CSS custom properties. (2) Single
-source of truth — slide order/numbering/slugs come from src/data/variants.js, flow content from
-src/data/steps.js; never hardcode. (3) No em dashes anywhere; use commas, periods, or en dashes.
-(4) Curly apostrophes and quotes in all audience-facing copy. (5) Monospace (IBM Plex Mono)
-only for section labels/titles and code, never prose or UI copy. (6) Projector-readable:
-vmin-scaled type, >=27px body / >=54px headings at 1080p, contrast >=4.5:1 for anything the
-audience reads. (7) Run npm run lint and npm test before any change is considered done.
+in this repo. Keep it to a small set of enforceable principles, not a style-guide dump.
+The non-negotiable principles are: (1) No inline style props: all styling lives in
+src/index.css keyed by class; per-render values pass as CSS custom properties. (2) Single
+source of truth: slide order/numbering/slugs come from src/data/variants.js, flow content
+from src/data/steps.js; never hardcode. (3) Projector-readable and accessible: vmin-scaled
+type, >=27px body / >=54px headings at 1080p, contrast >=4.5:1 for anything the audience
+reads; the accessibility tests (contrast, font size) are a gate, not advisory. (4) Audience-
+facing copy and typography follow the documented brand voice: no em dashes, curly apostrophes
+and quotes, IBM Plex Mono reserved for section labels/titles and code. The specifics live in
+docs/ingage-brand.md and docs/copy-style.md; reference them rather than restating them.
+(5) Definition of Done: no change is done until npm run lint, npm run format, npm test, and
+npm run build all pass. New behavior ships with tests; accessibility tests must pass.
+(6) Code explains intent in plain language and never cites spec/plan/task identifiers
+(FR-, SC-, US-, R-, T-IDs) in source or comments; traceability lives in the PR and commit
+history, not inline, because those identifiers renumber as artifacts change.
 ```
 
 Inspect: open `.specify/memory/constitution.md`. Confirm it filled the `[PLACEHOLDER]` tokens
-with _your_ rules, not boilerplate. This file is the gate every later step checks against.
-If it's weak, edit it by hand now. That's allowed and expected.
+with _your_ rules, not boilerplate, and that the brand-voice principle points at the docs
+instead of re-listing every rule. This file is the gate every later step checks against. If
+it's weak, edit it by hand now. That's allowed and expected.
+
+**Then refine it on purpose, to show it's a living artifact.** The generated Definition of Done
+lists `npm run lint`, `npm run format`, `npm test`, and `npm run build`. By hand, add
+`npm run test:e2e` to that gate, and note in Principle III that the accessibility checks run in
+both the unit tests and the end-to-end suite. This is a good beat to narrate: the constitution
+isn't a one-shot generation you accept as-is. It's an artifact you tune as you notice what your
+gates actually need, and every later step (`/speckit.plan`, `/speckit.analyze`) immediately
+checks against the tighter version.
 
 ---
 
@@ -197,3 +217,44 @@ Two `o`-specific things to verify in the diff personally:
    the modal will also reset the flow.
 2. **`o` doesn't collide.** It's currently unbound, so you're clear, but confirm the handler is
    sane (no text inputs exist in this app, so collision risk is low).
+
+---
+
+## Phase 10 — Amend the constitution (optional, 5 min, the "living artifact" beat)
+
+Skip if you're tight on time. But if the room is engaged, this is the beat that lands the point
+that the constitution is a versioned, living artifact, not a one-time setup step. It also differs
+from the quick by-hand tighten in Phase 2: a real amendment carries version discipline (a semver
+bump, a Sync Impact Report, and a re-check of the dependent templates).
+
+Good motivation to use, because it came up naturally during the run: while implementing, you may
+have noticed the agent appended a per-feature prose paragraph to `AGENTS.md`. That does not scale,
+the file is loaded into every agent session. So codify a rule that keeps the context file lean.
+
+The amendment re-runs the same command, which loads the _existing_ constitution and adds to it
+(it does not regenerate from scratch):
+
+```
+/speckit.constitution Add a new principle: the agent context file (AGENTS.md/CLAUDE.md) is a
+lean navigational index, not a per-feature changelog. Keep durable orientation plus pointers to
+canonical sources (docs/, the feature spec), never per-feature prose. When a change needs docs,
+update the canonical doc and at most a one-line pointer. Keep the other principles as they are.
+```
+
+What to point at when it finishes:
+
+- **The version bumped `1.0.0` -> `1.1.0`.** Adding a principle is a MINOR bump (new guidance).
+  MAJOR is for removing or redefining a principle, PATCH for wording and typo fixes.
+- **The Sync Impact Report** (the HTML comment at the top of `constitution.md`) gained a new entry,
+  and `Last Amended` advanced. The constitution documents its own change history.
+- **Dependent templates were re-checked** (`plan-template.md`, `spec-template.md`,
+  `tasks-template.md`). For this principle none need changes, but the command looks.
+
+By hand is also fine for a small change: add the `### VII.` block, set the version line to `1.1.0`,
+prepend a Sync Impact Report line, and eyeball the templates. Use the command when a principle is
+added or changed (it handles the version math and the report); edit by hand for a one-word fix.
+
+The framing to say out loud: the **seed** (the Phase 2 prompt) only matters for a fresh
+`specify init`. An existing repo already has a constitution, so you **amend** it, same principle
+text, a different entry point. From here on, every later step (`/speckit.plan`,
+`/speckit.analyze`, `/speckit.implement`) gates against `1.1.0`.
