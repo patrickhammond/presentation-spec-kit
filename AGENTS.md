@@ -92,3 +92,8 @@ The "Where to start?" slide renders the install one-liner as the light `.sl-inst
 - Run `npm run lint` and `npm test` before considering a change done.
 - For visual or content changes, build (`npm run build`) and sanity-check the affected slide/flow.
 - Keep `docs/` in sync with behavior changes; this repo treats docs as part of the deliverable.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
