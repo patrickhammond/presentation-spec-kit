@@ -66,6 +66,11 @@ const whereToStart = {
   id: "whereToStart",
   slug: "where-to-start",
 };
+const repo = {
+  type: "slide",
+  id: "repo",
+  slug: "can-i-get-the-slides",
+};
 
 // The ingage lightning arc (7-8 min, delivered). Title and creed are unnumbered;
 // the section counter starts at the Hook (sections 1-8). What's Next uses the
@@ -80,6 +85,7 @@ const ingageArc = withSections([
   why,
   honestClose,
   whereToStart,
+  repo,
   { type: "slide", id: "whatsNext", slug: "whats-next" },
 ]);
 
@@ -130,6 +136,7 @@ const gdgArc = withSections([
   why,
   { type: "slide", id: "lessons", slug: "what-ive-learned" },
   honestClose,
+  repo,
   {
     type: "slide",
     id: "whatsNext",

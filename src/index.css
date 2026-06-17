@@ -547,6 +547,32 @@ body,
 .slide.slide--title {
   max-width: min(1080px, 90%);
 }
+.slide.slide--wide {
+  max-width: min(1040px, 88%);
+}
+
+.sl-artifacts {
+  display: flex;
+  gap: clamp(40px, 7vmin, 88px);
+  align-items: center;
+}
+
+.sl-artifact {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5vmin;
+}
+
+.sl-repo-qa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vmin;
+}
+
+.sl-qr-svg {
+  width: clamp(168px, 20vmin, 264px);
+  height: clamp(168px, 20vmin, 264px);
+}
 
 /* ── Typography — vmin units for 16:10 viewport scaling ─────────────────── */
 /*    At 1080p (vmin = 10.8px): body ≈ 24px, h1 ≈ 54px, hero ≈ 86px          */
@@ -950,6 +976,10 @@ kbd {
   color: #004ab9;
   letter-spacing: 0.01em;
   font-weight: 500;
+  text-decoration: none;
+}
+.sl-mono-link:hover {
+  text-decoration: underline;
 }
 
 /* ── Self-referential spec.md card ───────────────────────────────────────── */

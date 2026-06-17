@@ -4,8 +4,7 @@
 // of a single slide is not worth splitting the deck across files.
 /* eslint-disable react-refresh/only-export-components */
 import { Fragment } from "react";
-
-// ── Primitives ──────────────────────────────────────────────────────────────
+import { QRCodeSVG } from "qrcode.react";
 
 function Label({ n, title }) {
   return (
@@ -50,6 +49,50 @@ function TitleSlide({
           </Fragment>
         ))}
       </p>
+    </div>
+  );
+}
+
+const REPO_URL = "https://github.com/patrickhammond/presentation-spec-kit";
+
+const EMAIL = "patrick.hammond@ingagepartners.com";
+
+function RepoSlide({ section }) {
+  return (
+    <div className="slide slide--wide">
+      <Label n={section} title="Can I Get The Slides?" />
+      <h1 className="sl-h1">We all learn together.</h1>
+      <div className="sl-artifacts">
+        <div className="sl-artifact">
+          <div className="sl-repo-qa">
+            <p className="sl-body">Want a copy of the presentation?</p>
+            <a
+              href={REPO_URL}
+              className="sl-mono-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {REPO_URL.replace("https://", "")}
+            </a>
+          </div>
+          <div className="sl-repo-qa">
+            <p className="sl-body">
+              Want to chat about AI, SDD, or Spec Kit for your teams?
+            </p>
+            <a href={`mailto:${EMAIL}`} className="sl-mono-link">
+              {EMAIL}
+            </a>
+          </div>
+        </div>
+        <QRCodeSVG
+          value={REPO_URL}
+          size={240}
+          bgColor="transparent"
+          fgColor="#20282d"
+          className="sl-qr-svg"
+          aria-label="QR code linking to the presentation GitHub repository"
+        />
+      </div>
     </div>
   );
 }
@@ -217,12 +260,6 @@ function HonestCloseSlide({ section }) {
         <li>Are specs living truth, throwaway, or merged into docs?</li>
         <li>When is the SDD ceremony not useful?</li>
         <li>Who owns specs, and where do they clash with existing tools?</li>
-        <li>
-          <strong>
-            How do we ensure a spec gets more than one perspective, human or
-            model, before any code?
-          </strong>
-        </li>
       </ul>
     </div>
   );
@@ -394,4 +431,5 @@ export const SLIDE_REGISTRY = {
   honestClose: HonestCloseSlide,
   whereToStart: WhereToStartSlide,
   whatsNext: WhatsNextSlide,
+  repo: RepoSlide,
 };
