@@ -1,6 +1,6 @@
 # Speaker Notes and Delivery Reference
 
-The spoken layer over the deck: a per-slide script, timings, and framing guardrails. Read alongside the slide arc in `CLAUDE.md`.
+The spoken layer over the deck plus the slide arc: per-slide structure and editorial intent, a per-slide script, timings, and framing guardrails. Slide order, numbering, and copy are defined in `src/data/variants.js`; this doc holds the intent behind each beat and the spoken delivery.
 
 The deck carries the words; you carry the personality. Each slide below lists 2–3 things to _say_ out loud, not read off the screen. Brisk pace is assumed and expected.
 
@@ -22,6 +22,29 @@ Delivery order. The flow is its own timed block, not a numbered slide. Code-leve
 | 8       | What's Next? (close: #ai-practitioners)    | ~15 s  |
 
 The cadence bet (smaller slides, one idea each) only pays off if live delivery is brisk. The flow is half your time; everything before it is setup, so rehearse the front five to run _fast_ and let the flow breathe. Rehearse against a clock.
+
+## Slide arc and editorial intent
+
+Slide order, numbering (`section` prop), slugs, and per-variant copy are defined in `src/data/variants.js`; components live in `src/slides/SlideShow.jsx`. This section holds the editorial intent behind each beat – the "why" the manifest doesn't capture.
+
+### `ingage` arc (7-8 min lightning talk, delivered)
+
+1. **Title** – hero headline "Understanding Spec Kit", byline in three beats: "Structured requirements an agent can act on. Results that land closer to done. Fits how you already work." (reframe → payoff → recognition). No kicker.
+2. **Requirements creed** – unnumbered epigraph / cold open ("Don't start coding until we understand the requirements." – every senior dev, eventually). No `Label`; the section counter starts at the Hook.
+3. **Hook** – "Speed isn't the problem. Drift is." Ends on bridge bold **Spec-Driven Development**. No "vibe coding" framing.
+4. **What's Spec-Driven Development?** – the lifecycle they already run (requirements → design → tickets).
+5. **What's Spec Kit?** – the tool; agent-agnostic; includes a self-referential `spec.md` excerpt. Ends on bridge bold **Spec Kit**.
+6. _(interactive flow inserted here)_
+7. **Why Should I Care?** – "Less rework. Fewer surprises at the end." The agent owns the _how_; you own the _what and result_. Carries both b-corp touches as a "less rework" couplet.
+8. **What Am I Still Figuring Out?** – honest close: open questions, last one bolded as standout. Single-column.
+9. **Where to start?** – heading "Your turn."; repo link and install chip.
+10. **What's Next?** – heading "Let's keep talking."; invite to `#ai-practitioners`. No repo/install block. Load-bearing closing beat (guardrails below).
+
+**The bridge-bold chain:** a slide that introduces the next slide's subject ends on that term bolded. Hook ends on bold **Spec-Driven Development**; the SDD slide ends on bold **Spec Kit**. Keep the chain intact when adding or reordering slides.
+
+### `gdg` arc (~40 min community talk, `?variant=gdg`)
+
+Superset of `ingage`. Adds: an **unnumbered who-am-I intro** after the title; a **"Time for a Demo"** transition (section 5, the live meta-demo centerpiece, after the flow); and a **"What I've Learned"** practitioner beat (section 7). Re-points the close to a **community invite** (no internal Slack) and the title byline to "Fits how you already work". Sections renumber 1-10. New components (`whoami`, `demo`, `lessons`) live in `SlideShow.jsx`; per-variant copy is plain-data props from the manifest (no JSX in `variants.js`). Demo runbook: [`demo.md`](demo.md).
 
 ## Spoken outline
 
