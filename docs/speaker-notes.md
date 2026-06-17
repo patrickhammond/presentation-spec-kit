@@ -44,7 +44,7 @@ Slide order, numbering (`section` prop), slugs, and per-variant copy are defined
 
 ### `gdg` arc (~40 min community talk, `?variant=gdg`)
 
-Superset of `ingage`. Adds: an **unnumbered who-am-I intro** after the title; a **"Time for a Demo"** transition (section 5, the live meta-demo centerpiece, after the flow); and a **"What I've Learned"** practitioner beat (section 7). Re-points the close to a **community invite** (no internal Slack) and the title byline to "Fits how you already work". Sections renumber 1-10. New components (`whoami`, `demo`, `lessons`) live in `SlideShow.jsx`; per-variant copy is plain-data props from the manifest (no JSX in `variants.js`). Demo runbook: [`demo.md`](demo.md).
+Superset of `ingage`. Adds: an **unnumbered who-am-I intro** after the title; a **"Time for a Demo"** transition (section 5, the live meta-demo centerpiece, after the flow); and a **"What I've Learned"** practitioner beat (section 7). Re-points the close to a **community invite** (no internal Slack) and the title byline to "Fits how you already work". Sections renumber 1-10. New components (`whoami`, `demo`, `lessons`) live in `SlideShow.jsx`; per-variant copy is plain-data props from the manifest (no JSX in `variants.js`). Demo playbook: [`../playbook.md`](../playbook.md).
 
 ## Spoken outline
 

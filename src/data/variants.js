@@ -21,7 +21,7 @@
 // Selected at load time by the `?variant=` query param, validated against the
 // keys below via isKnownVariant. When no (or an unknown) variant is given, the
 // app shows the variant picker (src/picker/VariantPicker.jsx) instead of
-// silently defaulting; see specs/001-variant-picker/.
+// silently defaulting.
 
 export const DEFAULT_VARIANT = "ingage";
 
