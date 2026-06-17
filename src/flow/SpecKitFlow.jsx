@@ -40,8 +40,6 @@ const GATE_STYLE = {
   strokeWidth: 1.5,
   strokeDasharray: "5 4",
 };
-const LOOP_STYLE = { stroke: "#3fd6c0", strokeWidth: 1.5 };
-
 const INITIAL_EDGES = [
   // Main flow — tasks goes directly to implement; analyze is optional
   {
@@ -197,10 +195,13 @@ function FlowCanvas({ activeId, setActiveId }) {
   const [edges] = useEdgesState(INITIAL_EDGES);
   const { setCenter, fitView } = useReactFlow();
   const canvasWidth = useStore((s) => s.width);
-  // Keep a ref so onInit and the effect always read the latest canvas width
-  // without needing it as a closure dependency
+  // Keep a ref so onInit reads the latest canvas width without taking it as a
+  // closure dependency. Synced in an effect (writing a ref during render is not
+  // allowed); the positioning effect below reads canvasWidth directly.
   const canvasWidthRef = useRef(canvasWidth);
-  canvasWidthRef.current = canvasWidth;
+  useEffect(() => {
+    canvasWidthRef.current = canvasWidth;
+  }, [canvasWidth]);
   // Guard: don't call setCenter/fitView until ReactFlow has initialized
   const isInitialized = useRef(false);
 
@@ -225,7 +226,7 @@ function FlowCanvas({ activeId, setActiveId }) {
       const cx = pos.x + (isOpt ? NODE_W_OPT : NODE_W_MAIN) / 2;
       const cy = pos.y + NODE_H / 2;
       // Shift left so the node centres in the open 67% (panel covers right 33%)
-      const offset = (canvasWidthRef.current * 0.165) / zoom;
+      const offset = (canvasWidth * 0.165) / zoom;
       setCenter(cx + offset, cy, { zoom, duration: 500 });
     } else {
       fitView({ duration: 500, padding: 0.12 });
