@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project context
 
-This is a **7-8 minute lightning talk** about Spec Kit (Spec-Driven Development) for an Ingage audience. **Audience, format, goals, and success criteria live in [`docs/audience.md`](docs/audience.md) – read it before any slide or script work.** In short: ~40 people, mostly mature/experienced developers plus delivery/org staff; the goal is curiosity, awareness, and familiarity, not a how-to.
+This is a talk about Spec Kit (Spec-Driven Development), delivered as **multiple variants from one codebase** (architecture C): a ~40 min **GDG Cincinnati** community talk (primary, in development), the delivered 7-8 min **Ingage** lightning talk, and a client template. **Audience, format, goals, and success criteria are per variant: [`docs/audience.md`](docs/audience.md) is the index, read the profile for the variant you are working on before any slide or script work.**
 
 The talk has two deliverables, presented as one combined slideshow (`src/App.jsx` interleaves them):
 
-1. **Slides** – the deck lives in `src/slides/SlideShow.jsx` (`SLIDE_COUNT = 9`). Current arc (the interactive flow is inserted after slide 5, at `FLOW_SLIDE_INDEX = 4`):
+1. **Slides** – slide components live in `src/slides/SlideShow.jsx` (exported via `SLIDE_REGISTRY`), but **which slides appear, in what order, with what section number and URL slug is driven per variant by the manifest in [`src/data/variants.js`](src/data/variants.js)**, not hardcoded. The active variant is chosen by the `?variant=` query param; with no (or an unknown) variant the app shows the variant picker (`src/picker/VariantPicker.jsx`) rather than silently defaulting. The interactive flow is a manifest entry (`type: "flow"`), not a numbered slide. Section numbers (`section` prop) and per-variant copy (props) come from the manifest. Current `ingage` arc:
    1. **Title** – hero headline "Understanding Spec Kit", byline carries the story in three beats: "Structured requirements an agent can act on. Results that land closer to done. Fits how you already work." (reframe → payoff → recognition). No kicker. The recognition beat ("the lifecycle you already run") lives on the creed/SDD slides rather than crowding the cover. Replaces the old anxiety framing ("Shipping code you didn't write"), which duplicated the Hook and excluded the non-dev half of the room.
    2. **Requirements creed** – unnumbered epigraph / cold open ("Don't start coding until we understand the requirements." – every senior dev, eventually). Anchors the talk in a discipline the room already knows, before the Hook reframes it for the AI era. No `Label`: the section counter starts at the Hook.
    3. **Hook** – the problem, framed as drift/rework: "Speed isn't the problem. Drift is." An agent builds fast but can drift from intent; the distance between what you intended and what got built is where surprises and rework hide. Echoes the Why Should I Care? payoff ("Less rework. Fewer surprises.") on purpose, and ends on the bridge bold "Spec-Driven Development closes that gap." (The earlier trust/traceability framing – "You didn't write it. Now you have to trust it." – was cut: it set up a "trust" payoff the talk never resolves and re-centered the code-reader on a slide the mixed room needs to stay with.) No "vibe coding" framing.
@@ -19,6 +19,8 @@ The talk has two deliverables, presented as one combined slideshow (`src/App.jsx
    8. **What Am I Still Figuring Out?** – honest close: nothing here is new, what's new is trusting an agent with it; still learning how it holds up over time. Ends on a list of genuinely open questions, the last one bolded as the standout (multiple-perspective spec review). (Interrogative label; single-column, no two-stack.)
    9. **Where to start?** – the "go do it" half of the former combined close: heading "Your turn." (pays off the "workflow you already do" thesis), repo link (`https://github.com/github/spec-kit`), and the install one-liner chip. Developer-facing; the ecosystem nod lives on the SDD slide, not here.
    10. **What's Next?** – the close, on its own slide: the explicit ask. Heading "Let's keep talking."; picks up the open questions from the previous slide and turns them into the invite to keep the conversation going in the team `#ai-practitioners` Slack channel. This is the load-bearing closing beat (see `docs/speaker-notes.md` → closing guardrails). Deliberately holds just the ask, with no competing repo/install block.
+       **`gdg` arc** (~40 min community talk, `?variant=gdg`) is a superset of the above: it adds an **unnumbered who-am-I intro** after the title (placeholder copy, props let you fill it in), a **"Time for a Demo"** transition (section 5, the live meta-demo centerpiece, after the flow), and a **"What I've Learned"** practitioner beat (section 7, lessons that stuck, distinct from the open-questions slide). It re-points the close to a **community invite** (plain-string `inviteLines` prop, no internal Slack) and the title byline to "Fits how you already work" (`taglineLines` prop). Sections renumber to 1-10. New components (`whoami`, `demo`, `lessons`) live in `SlideShow.jsx`; per-variant copy is plain-data props from the manifest (no JSX in `variants.js`).
+
 2. **Interactive flow visual** – a React Flow node graph of the Spec Kit workflow, shown on stage and self-guided in the shared copy.
 
 The core thesis: _Spec Kit isn't a new methodology. It's the development lifecycle you already know, except requirements, design, and tickets become executable inputs for an AI agent instead of documents that rot in a wiki._
@@ -92,3 +94,12 @@ Install commands for the closing "What's Next?" slide (rendered as the light `.s
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 specify init <project>
 ```
+
+<!-- SPECKIT START -->
+
+For project structure, conventions, and the variant system, read
+`docs/tech-stack.md` and the constitution at `.specify/memory/constitution.md`.
+`specs/001-variant-picker/` is a complete worked example of the Spec Kit flow
+(spec, plan, tasks, contracts) for the talk's live demo.
+
+<!-- SPECKIT END -->

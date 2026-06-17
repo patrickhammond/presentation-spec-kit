@@ -6,7 +6,7 @@ The deck carries the words; you carry the personality. Each slide below lists 2�
 
 ## Per-slide timings (target: 7–8 min total)
 
-Delivery order. The flow is its own timed block, not a numbered slide. Code-level indices live in `CLAUDE.md` (`SLIDE_COUNT = 9`, `FLOW_SLIDE_INDEX = 4`).
+Delivery order for the `ingage` variant. The flow is its own timed block, not a numbered slide. Slide order and section numbers are defined per variant in `src/data/variants.js` (see `CLAUDE.md`).
 
 | Slide   | Section                                    | Target |
 | ------- | ------------------------------------------ | ------ |
@@ -115,3 +115,29 @@ The closing run is three beats: the open questions (**What Am I Still Figuring O
 **What's Next? (the close):**
 
 - Its own slide now, holding just the ask. End on the explicit invite to keep the conversation going in `#ai-practitioners`: that is the goal, turning a passive room into people who keep talking. The heading ("Let's keep talking.") answers the prior open-questions slide – frame it as "those questions? let's chew on them together," not a sign-off.
+- **Community variants do not use `#ai-practitioners`.** The `gdg` close swaps in a community invite (see below).
+
+## GDG Cincinnati variant (~40 min, `?variant=gdg`)
+
+Same spine as the lightning talk, with room to breathe and a live demo. The timings above are the lightning budget; for GDG, slow the front section, let the flow breathe, and let the demo be the centerpiece. Profile: [`audience-gdg-cincinnati.md`](audience-gdg-cincinnati.md).
+
+Rough 40-min budget (adjust to the clock):
+
+| Beat                                              | Target     |
+| ------------------------------------------------- | ---------- |
+| Title + Who am I (intro)                          | ~2 min     |
+| Creed + Hook                                      | ~2 min     |
+| SDD + Spec Kit                                    | ~3 min     |
+| Flow (8 commands, loops)                          | ~7 min     |
+| Time for a Demo (the meta demo)                   | ~12-15 min |
+| Why Should I Care?                                | ~2 min     |
+| What I've Learned (lessons)                       | ~3 min     |
+| Still Figuring Out + Where to start + What's Next | ~4 min     |
+| Q&A                                               | remainder  |
+
+Notes on the GDG-only slides:
+
+- **Who am I (intro, unnumbered):** placeholder until filled in. Keep it short, credibility not life story: role, how long building software, how you got into SDD, why you care. It buys trust for the honest beats later.
+- **Time for a Demo (section 5):** the centerpiece. After the flow, say "you've seen the eight commands, now watch them run on this very deck." Then switch to the terminal and run the live `/speckit` flow against this repo (see the demo runbook once written). Safety net: a finished branch you can `git checkout` if a live run wanders. The point the room should leave with: the constitution catching house-style violations on agent-written code.
+- **What I've Learned (section 7):** practitioner lessons that stuck, distinct from the open-questions slide. This is what a community dev room values most, honest in-the-trenches detail. One bolded standout.
+- **Close (What's Next?, section 10):** a community invite, not the internal Slack. The deck's `inviteLines` prop carries it; fill in your real handle/contact. Still end on "let's keep talking," still curiosity over summary.
