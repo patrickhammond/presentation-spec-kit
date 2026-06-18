@@ -21,6 +21,8 @@
 - Inside the backdrop, renders a panel (`div.outline-panel`) with
   `onClick={e => e.stopPropagation()}` so clicks inside do not bubble to the backdrop.
 - Inside the panel, renders a `ul.outline-list` with one `button.outline-entry` per entry.
+  Buttons are **direct children** of the `ul` — no `li` wrapper — so that `role="listbox"` /
+  `role="option"` ownership is valid and axe passes `aria-required-children`.
 - Each button renders:
   - `span.outline-section-num` — zero-padded section number (e.g. "01") if the entry
     has a `section` field; empty otherwise.
@@ -49,7 +51,9 @@ Escape and "m" are handled by Deck's global `onKey` (not this component).
 - `focusedIndex` changes cause the corresponding button to receive `focus()` via a
   `useEffect` + ref array.
 - On unmount (modal closes), focus returns to the document body or the previously
-  focused element (browser default).
+  focused element (browser default). Explicit focus restoration is not implemented
+  because the modal has no physical trigger element — it is opened by a global keydown
+  handler, so there is no single element to return focus to.
 
 ## Accessibility contract
 

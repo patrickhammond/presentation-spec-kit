@@ -4,11 +4,11 @@
 
 **Created**: 2026-06-17
 
-**Status**: Draft
+**Status**: Implemented
 
-**Input**: User description: "Add a hidden 'outline' overlay to the deck. When the presenter presses the 'o' key, a modal opens listing every entry in the current talk variant in order — section number, title, and a marker for the interactive flow — so I can jump directly to any slide or to the flow during a talk. Selecting an entry navigates the deck there and closes the modal. Pressing 'o' again or Escape closes it. It is presenter-only: there is no visible button or hint that it exists. It must work for any variant, reading the entry list from the variant manifest rather than a hardcoded list."
+**Input**: User description: "Add a hidden 'outline' overlay to the deck. When the presenter presses the ~~'o'~~ **'m'** key, a modal opens listing every entry in the current talk variant in order — section number, title, and a marker for the interactive flow — so I can jump directly to any slide or to the flow during a talk. Selecting an entry navigates the deck there and closes the modal. Pressing 'o' again or Escape closes it. It is presenter-only: there is no visible button or hint that it exists. It must work for any variant, reading the entry list from the variant manifest rather than a hardcoded list."
 
-_(Key binding clarified to "m" — see Clarifications below.)_
+_(Key binding clarified from "o" to "m" — see Clarifications below.)_
 
 ---
 
