@@ -45,38 +45,68 @@ const creed = {
   type: "slide",
   id: "requirements",
   slug: "quote-requirements",
+  label: "Your Spec Is Your Contract",
   numbered: false,
 };
-const hook = { type: "slide", id: "hook", slug: "whats-the-problem" };
-const sdd = { type: "slide", id: "sdd", slug: "whats-sdd" };
-const specKit = { type: "slide", id: "specKit", slug: "whats-spec-kit" };
+const hook = {
+  type: "slide",
+  id: "hook",
+  slug: "whats-the-problem",
+  label: "What’s the Problem?",
+};
+const sdd = {
+  type: "slide",
+  id: "sdd",
+  slug: "whats-sdd",
+  label: "What’s Spec-Driven Development?",
+};
+const specKit = {
+  type: "slide",
+  id: "specKit",
+  slug: "whats-spec-kit",
+  label: "What’s Spec Kit?",
+};
 const flow = {
   type: "flow",
   slug: "spec-kit-flow",
   label: "What’s The Process?",
 };
-const why = { type: "slide", id: "why", slug: "why-should-i-care" };
+const why = {
+  type: "slide",
+  id: "why",
+  slug: "why-should-i-care",
+  label: "Why Should I Care?",
+};
 const honestClose = {
   type: "slide",
   id: "honestClose",
   slug: "what-am-i-still-figuring-out",
+  label: "What Am I Still Figuring Out?",
 };
 const whereToStart = {
   type: "slide",
   id: "whereToStart",
   slug: "where-to-start",
+  label: "Where to Start?",
 };
 const repo = {
   type: "slide",
   id: "repo",
   slug: "can-i-get-the-slides",
+  label: "Can I Get the Slides?",
 };
 
 // The ingage lightning arc (7-8 min, delivered). Title and creed are unnumbered;
 // the section counter starts at the Hook (sections 1-8). What's Next uses the
 // component default invite (internal Slack).
 const ingageArc = withSections([
-  { type: "slide", id: "title", slug: "title", numbered: false },
+  {
+    type: "slide",
+    id: "title",
+    slug: "title",
+    label: "Welcome",
+    numbered: false,
+  },
   creed,
   hook,
   sdd,
@@ -86,7 +116,7 @@ const ingageArc = withSections([
   honestClose,
   whereToStart,
   repo,
-  { type: "slide", id: "whatsNext", slug: "whats-next" },
+  { type: "slide", id: "whatsNext", slug: "whats-next", label: "What's Next?" },
 ]);
 
 // The GDG Cincinnati arc (~40 min community talk, all-dev). Superset of the
@@ -99,6 +129,7 @@ const gdgArc = withSections([
     type: "slide",
     id: "title",
     slug: "title",
+    label: "Welcome",
     numbered: false,
     props: {
       taglineLines: [
@@ -112,6 +143,7 @@ const gdgArc = withSections([
     type: "slide",
     id: "whoami",
     slug: "who-am-i",
+    label: "Who Am I?",
     numbered: false,
     props: {
       name: "Patrick Hammond",
@@ -132,15 +164,21 @@ const gdgArc = withSections([
   specKit,
   whereToStart,
   flow,
-  { type: "slide", id: "demo", slug: "demo" },
+  { type: "slide", id: "demo", slug: "demo", label: "Time for a Demo" },
   why,
-  { type: "slide", id: "lessons", slug: "what-ive-learned" },
+  {
+    type: "slide",
+    id: "lessons",
+    slug: "what-ive-learned",
+    label: "What I've Learned",
+  },
   honestClose,
   repo,
   {
     type: "slide",
     id: "whatsNext",
     slug: "whats-next",
+    label: "What's Next?",
     props: {
       inviteLines: [
         "Let’s make this a group discussion, not a Q&A.",

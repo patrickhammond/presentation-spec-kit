@@ -29,7 +29,7 @@ Single project: `src/` at repository root.
 **Purpose**: Add the `label` field to variants.js — the only prerequisite every
 subsequent task depends on. Without it, OutlineModal cannot render entry titles.
 
-- [ ] T001 Add `label` field to all 13 slide entry constants in `src/data/variants.js`
+- [x] T001 Add `label` field to all 13 slide entry constants in `src/data/variants.js`
       (see data-model.md for the full label table: title → "Welcome", hook → "What's the
       Problem?", sdd → "What's Spec-Driven Development?", specKit → "What's Spec Kit?",
       requirements → "Your Spec Is Your Contract", why → "Why Should I Care?", honestClose
@@ -53,7 +53,7 @@ See quickstart.md scenario 1.
 
 ### Implementation for User Story 1
 
-- [ ] T002 [P] [US1] Add all `.outline-*` CSS classes to `src/index.css`: `.outline-backdrop`
+- [x] T002 [P] [US1] Add all `.outline-*` CSS classes to `src/index.css`: `.outline-backdrop`
       (position:fixed; inset:0; semi-transparent dark overlay), `.outline-panel` (centered
       container; light background; border-radius; max-width), `.outline-list` (list-style:none;
       margin/padding reset), `.outline-entry` (full-width button; flex row; gap; cursor:pointer),
@@ -62,7 +62,7 @@ See quickstart.md scenario 1.
       `.outline-title` (readable weight and size). All sizes in `vmin` or `em`; contrast
       ≥ 4.5:1 for all text. No inline style props.
 
-- [ ] T003 [P] [US1] Implement `OutlineModal` component in `src/outline/OutlineModal.jsx`:
+- [x] T003 [P] [US1] Implement `OutlineModal` component in `src/outline/OutlineModal.jsx`:
       props are `entries`, `onNavigate(index)`, `onClose`; internal state is `focusedIndex`
       (number, initialized to 0); render a `div.outline-backdrop` with `onClick={onClose}`,
       inside it a `div.outline-panel` with `role="dialog"` `aria-modal="true"` and
@@ -76,7 +76,7 @@ See quickstart.md scenario 1.
       use a ref array (one ref per entry) and a useEffect to call focus() on the focused
       button when focusedIndex changes; initialize focus on the first entry on mount.
 
-- [ ] T004 [US1] Add `outlineOpen` state to `Deck` in `src/App.jsx` and modify `Deck`'s
+- [x] T004 [US1] Add `outlineOpen` state to `Deck` in `src/App.jsx` and modify `Deck`'s
       `onKey` handler (inside the existing `useEffect`): at the top of `onKey`, before any
       other handling, check `e.key === "m"` — if so, call `e.preventDefault()`, toggle
       `setOutlineOpen`, and return; then check `outlineOpen` — if true and `e.key ===
@@ -86,14 +86,14 @@ See quickstart.md scenario 1.
       and return without advancing the deck. Add `outlineOpen` to the `useEffect` dependency
       array.
 
-- [ ] T005 [US1] Render `<OutlineModal>` conditionally in `Deck`'s JSX in `src/App.jsx`:
+- [x] T005 [US1] Render `<OutlineModal>` conditionally in `Deck`'s JSX in `src/App.jsx`:
       import `OutlineModal` from `./outline/OutlineModal.jsx`; inside the `.slideshow` div,
       render `{outlineOpen && <OutlineModal entries={entries} onNavigate={i => {
 navigateTo(i); setOutlineOpen(false); }} onClose={() => setOutlineOpen(false)} />}`.
 
 ### Tests for User Story 1
 
-- [ ] T006 [P] [US1] Write unit tests for `OutlineModal` in `src/outline/OutlineModal.test.jsx`
+- [x] T006 [P] [US1] Write unit tests for `OutlineModal` in `src/outline/OutlineModal.test.jsx`
       using `render`/`fireEvent` from `@testing-library/react` and vitest: (1) renders one
       button per entry in `entries`; (2) all `entry.label` values are visible in the output;
       (3) clicking entry at index 2 calls `onNavigate(2)`; (4) pressing ArrowDown then Enter
@@ -119,12 +119,12 @@ deck lands on the flow in overview state. See quickstart.md scenario 2.
 
 ### Implementation for User Story 2
 
-- [ ] T007 [P] [US2] Add flow-entry CSS to `src/index.css`: `.outline-entry[data-type="flow"]`
+- [x] T007 [P] [US2] Add flow-entry CSS to `src/index.css`: `.outline-entry[data-type="flow"]`
       (optional distinct background or border tint), `.outline-flow-badge` (small inline
       chip/pill; accent color — use existing `--orange` or brand accent; font-size smaller
       than body; padding; border-radius). No inline styles.
 
-- [ ] T008 [US2] In `src/outline/OutlineModal.jsx`, inside the entry button render,
+- [x] T008 [US2] In `src/outline/OutlineModal.jsx`, inside the entry button render,
       add a `{entry.type === "flow" && <span className="outline-flow-badge">interactive</span>}`
       after `span.outline-title`. The `data-type={entry.type}` attribute was already added
       in T003; verify it is present on the flow entry button.
@@ -145,7 +145,7 @@ Escape priority in flow).
 
 ### Tests for User Story 3
 
-- [ ] T009 [US3] Write integration tests for outline dismiss behaviors in
+- [x] T009 [US3] Write integration tests for outline dismiss behaviors in
       `src/App.resolve.test.jsx` (alongside existing App tests, using the same `visit()`
       helper): (1) given `?variant=ingage`, simulate keydown "m" — assert `.outline-backdrop`
       is present; simulate keydown "m" again — assert `.outline-backdrop` is absent and
@@ -164,12 +164,12 @@ Escape priority in flow).
 
 **Purpose**: DoD gate and any final cleanup.
 
-- [ ] T010 [P] Verify no visible outline trigger exists in the deck UI: open
+- [x] T010 [P] Verify no visible outline trigger exists in the deck UI: open
       `?variant=ingage` and `?variant=gdg`, inspect the slide chrome (corners, dot nav,
       any overlay) — confirm no button, label, hint text, or keyboard legend references
       the outline or "m" key. No code change expected; this is a manual verification step.
 
-- [ ] T011 Run full DoD gate from repo root: `npm run lint && npm run format && npm test
+- [x] T011 Run full DoD gate from repo root: `npm run lint && npm run format && npm test
 && npm run build` — all four MUST pass with zero new failures or warnings before the
       feature is considered done.
 

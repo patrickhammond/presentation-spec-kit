@@ -68,3 +68,62 @@ describe("Pick a talk switcher visibility", () => {
     expect(container.querySelector(".deck-to-picker")).toBeNull();
   });
 });
+
+describe("Outline modal dismiss behaviors", () => {
+  it("opens on m and closes on second m without changing the slide", () => {
+    const { container } = visit("/?variant=ingage");
+    expect(container.querySelector(".outline-backdrop")).toBeNull();
+
+    // Capture slide text before touching the outline at all
+    const textBefore = container.querySelector(".slideshow").textContent;
+
+    fireEvent.keyDown(window, { key: "m" });
+    expect(container.querySelector(".outline-backdrop")).not.toBeNull();
+
+    fireEvent.keyDown(window, { key: "m" });
+    expect(container.querySelector(".outline-backdrop")).toBeNull();
+    expect(container.querySelector(".slideshow").textContent).toBe(textBefore);
+  });
+
+  it("closes on Escape without changing the slide", () => {
+    const { container } = visit("/?variant=ingage");
+
+    // Capture slide text before opening the outline
+    const textBefore = container.querySelector(".slideshow").textContent;
+
+    fireEvent.keyDown(window, { key: "m" });
+    expect(container.querySelector(".outline-backdrop")).not.toBeNull();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(container.querySelector(".outline-backdrop")).toBeNull();
+    expect(container.querySelector(".slideshow").textContent).toBe(textBefore);
+  });
+
+  it("closes on backdrop click", () => {
+    const { container } = visit("/?variant=ingage");
+    fireEvent.keyDown(window, { key: "m" });
+    expect(container.querySelector(".outline-backdrop")).not.toBeNull();
+
+    fireEvent.click(container.querySelector(".outline-backdrop"));
+    expect(container.querySelector(".outline-backdrop")).toBeNull();
+  });
+
+  it("Escape closes the outline but does not clear a focused flow node", () => {
+    const { container } = visit("/?variant=ingage#spec-kit-flow/specify");
+    // The deck is on the flow with a focused node; open the outline
+    fireEvent.keyDown(window, { key: "m" });
+    expect(container.querySelector(".outline-backdrop")).not.toBeNull();
+
+    // Escape dismisses the outline; the deck must still be on the flow entry
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(container.querySelector(".outline-backdrop")).toBeNull();
+    expect(container.querySelector(".flow-anim")).not.toBeNull();
+  });
+
+  it("m key is a no-op on the picker (no deck rendered)", () => {
+    const { container } = visit("/");
+    expect(container.querySelector(".picker")).not.toBeNull();
+    fireEvent.keyDown(window, { key: "m" });
+    expect(container.querySelector(".outline-backdrop")).toBeNull();
+  });
+});

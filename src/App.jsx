@@ -4,6 +4,7 @@ import { SLIDE_REGISTRY } from "./slides/SlideShow.jsx";
 import { VARIANTS, isKnownVariant } from "./data/variants.js";
 import { STEP_IDS } from "./data/steps.js";
 import VariantPicker from "./picker/VariantPicker.jsx";
+import OutlineModal from "./outline/OutlineModal.jsx";
 
 const FLOW_SLUG = "spec-kit-flow";
 
@@ -113,6 +114,7 @@ function Deck({ variantKey, onExit }) {
   const initial = parseHash();
   const [index, setIndex] = useState(initial.index);
   const [activeId, setActiveId] = useState(initial.activeId);
+  const [outlineOpen, setOutlineOpen] = useState(false);
 
   const entry = entries[index];
   const inFlow = entry?.type === "flow";
@@ -124,6 +126,31 @@ function Deck({ variantKey, onExit }) {
 
   useEffect(() => {
     function onKey(e) {
+      if (e.key === "m") {
+        e.preventDefault();
+        setOutlineOpen((open) => !open);
+        return;
+      }
+
+      if (outlineOpen) {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          setOutlineOpen(false);
+        }
+        // Suppress all deck navigation while the outline is open; the modal
+        // handles its own Up/Down/Enter internally.
+        if (
+          e.key === "ArrowRight" ||
+          e.key === "ArrowDown" ||
+          e.key === "ArrowLeft" ||
+          e.key === "ArrowUp" ||
+          e.key === " "
+        ) {
+          e.preventDefault();
+        }
+        return;
+      }
+
       const forward =
         e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ";
       const back = e.key === "ArrowLeft" || e.key === "ArrowUp";
@@ -171,7 +198,7 @@ function Deck({ variantKey, onExit }) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [inFlow, activeId, entries.length]);
+  }, [inFlow, activeId, entries.length, outlineOpen]);
 
   // Reflect the current location in the URL hash. replaceState keeps the URL
   // shareable without pushing a history entry for every step, and preserves the
@@ -199,6 +226,16 @@ function Deck({ variantKey, onExit }) {
 
   return (
     <div className="slideshow">
+      {outlineOpen && (
+        <OutlineModal
+          entries={entries}
+          onNavigate={(i) => {
+            navigateTo(i);
+            setOutlineOpen(false);
+          }}
+          onClose={() => setOutlineOpen(false)}
+        />
+      )}
       <div className="slide-stage">
         {/* Title slide already shows the hero logo up top; reserve the corner mark for the rest */}
         {entry?.id !== "title" && (
