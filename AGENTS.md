@@ -94,6 +94,9 @@ The "Where to start?" slide renders the install one-liner as the light `.sl-inst
 - Keep `docs/` in sync with behavior changes; this repo treats docs as part of the deliverable.
 
 <!-- SPECKIT START -->
+
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
+at specs/001-outline-modal/plan.md
+
 <!-- SPECKIT END -->
