@@ -316,11 +316,9 @@ function HonestCloseSlide({ section }) {
         <li>
           Once the code ships, do specs live on, merge into docs, or expire?
         </li>
-        <li>
-          Which roles own specs, and where do they clash with existing
-          processes?
-        </li>
-        <li>How do you actually work with a thousand specs?</li>
+        <li>Which roles own which spec artifacts?</li>
+        <li>Where does this clash with the process a team already runs?</li>
+        <li>What does a project with a thousand specs actually look like?</li>
       </ul>
     </div>
   );
