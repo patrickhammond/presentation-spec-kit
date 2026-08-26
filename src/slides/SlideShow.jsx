@@ -161,12 +161,11 @@ function HookSlide({ section }) {
       <p className="sl-body">
         Hand an agent a vague ask and it builds something in seconds: fast,
         confident, and <em className="sl-em">not always what you meant</em>. The
-        distance between what you intended and what got built is where the
-        surprises and rework hide.
+        gap between what you asked for and what you got is rework.
       </p>
       {/* Bridge bold: foreshadows the next slide (SDD). See CLAUDE.md content principles. */}
       <p className="sl-body">
-        <strong>Spec-Driven Development</strong> closes that gap.
+        <strong>Spec-Driven Development</strong> closes the gap.
       </p>
     </div>
   );
