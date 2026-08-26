@@ -130,12 +130,12 @@ const gdgArc = withSections([
   hook,
   sdd,
   specKit,
-  whereToStart,
   flow,
   { type: "slide", id: "demo", slug: "demo" },
   why,
   { type: "slide", id: "lessons", slug: "what-ive-learned" },
   honestClose,
+  whereToStart,
   repo,
   {
     type: "slide",
@@ -148,6 +148,108 @@ const gdgArc = withSections([
       ],
     },
   },
+]);
+
+// The Cincy.dev AI-Augmented Engineers arc (~40 min community talk, no live
+// demo). A sibling of the GDG arc, not a fork of it: same shared entries, but
+// the demo transition is replaced by two beats that carry the hands-on without
+// a terminal on stage.
+//
+//   - `spectrum`: the tooling landscape, after the SDD slide. The room is
+//     agent-fluent, so the four tool names are landmarks rather than subjects,
+//     which is what lets it precede "What's Spec Kit?". Its payoff lands later
+//     as a lead line on Why Should I Care?, not as a second showing of the
+//     chart: the legend is most of the slide's ink, so repeating it read as a
+//     duplicate rather than a callback.
+//   - `artifacts`: a stepped walk through what each command actually writes,
+//     using this repo's own outline-modal artifacts. Its stops are sub-steps of
+//     one entry (see src/deck/navigation.js), not separate slides.
+//
+// The `sdd` ecosystem line is dropped here (`ecosystem: false`): the spectrum
+// slide immediately after it names the same landscape in more detail. That line
+// also carried the bridge bold, which with the spectrum in between would have
+// pointed two slides ahead. See CLAUDE.md content principles.
+const cincydevAiArc = withSections([
+  {
+    type: "slide",
+    id: "title",
+    slug: "title",
+    numbered: false,
+    props: {
+      taglineLines: [
+        "Structured requirements an agent can act on.",
+        "Results that land closer to done.",
+        "Fits how you already work.",
+      ],
+    },
+  },
+  {
+    type: "slide",
+    id: "whoami",
+    slug: "who-am-i",
+    numbered: false,
+    props: {
+      name: "Patrick Hammond",
+      points: [
+        "Director at Ingage Partners.",
+        "Previous co-founder and CTO at Atomic Robot.",
+        "Co-organizer of GDG Cincinnati and Ohio DevFest.",
+      ],
+      standout:
+        "20+ years creating software… and having more fun now than ever before!",
+      photo: "/img/patrick-hammond.jpg",
+      photoAlt: "Patrick Hammond",
+    },
+  },
+  creed,
+  hook,
+  {
+    type: "slide",
+    id: "sdd",
+    slug: "whats-sdd",
+    // The spectrum slide is next: it names the landscape properly, so this
+    // slide drops its one-line ecosystem mention (and with it the bridge bold,
+    // which would otherwise point two slides ahead).
+    props: { ecosystem: false },
+  },
+  {
+    type: "slide",
+    id: "spectrum",
+    slug: "where-does-this-fit",
+    props: {
+      title: "Where Does This Fit?",
+      heading: "There isn’t a winner. There’s a trade.",
+      lines: [
+        "More ceremony up front buys less churn later. You pay either way, just at different times. So the question isn’t which tool is best. It’s whether the ceremony matches how complicated the problem actually is.",
+      ],
+    },
+  },
+  specKit,
+  flow,
+  { type: "slide", id: "artifacts", slug: "artifacts" },
+  {
+    type: "slide",
+    id: "why",
+    slug: "why-should-i-care",
+    // The artifact walk just showed this room the whole cost side, so the
+    // payoff slide names it. This replaces a second showing of the spectrum,
+    // which repeated too much of its own ink to read as a callback.
+    props: {
+      leadLines: [
+        "You just read everything Spec Kit writes before a line of code exists. *That is what the ceremony buys*: the most to write up front, the least to redo later.",
+      ],
+    },
+  },
+  { type: "slide", id: "lessons", slug: "what-ive-learned" },
+  honestClose,
+  // The closing run: where to start, then the deck itself, then the ask. Every
+  // arc runs whereToStart here, so the "go do it" door sits next to the repo
+  // link the room actually leaves with.
+  whereToStart,
+  // Ends on the repo slide. This arc has no What's Next? beat: the closing ask
+  // is made out loud, not on a slide, so the deck the room takes away finishes
+  // on the link and the contact details.
+  repo,
 ]);
 
 // Each variant also carries `meta` (room, length, demo) so the variant picker
@@ -172,6 +274,15 @@ export const VARIANTS = {
       demo: true,
     },
     entries: gdgArc,
+  },
+  "cincydev-ai": {
+    label: "Cincy.dev – AI-Augmented Engineers",
+    meta: {
+      room: "Community, agent-fluent developers",
+      length: "~40 min",
+      demo: false,
+    },
+    entries: cincydevAiArc,
   },
 };
 

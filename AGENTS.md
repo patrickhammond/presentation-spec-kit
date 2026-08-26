@@ -36,7 +36,17 @@ npm test          # vitest (slide/flow unit tests)
 
 The active variant is chosen by the `?variant=` query param; with no (or unknown) variant the app shows the variant picker. The interactive flow is a manifest entry (`type: "flow"`), not a numbered slide. Slide order, section numbers (`section` prop), slugs, and per-variant copy all come from the manifest in `src/data/variants.js` (the SoT); slide components live in `src/slides/SlideShow.jsx`.
 
-Two arcs ship today: **`ingage`** (7-8 min lightning talk, delivered) and **`gdg`** (~40 min community talk, `?variant=gdg`), a superset that adds a who-am-I intro, a "Time for a Demo" transition, and a "What I've Learned" beat (components `whoami`, `demo`, `lessons` in `SlideShow.jsx`). The slide-by-slide arc, the bridge-bold chain, and the editorial intent behind each beat live in [`docs/speaker-notes.md`](docs/speaker-notes.md) → Slide arc and editorial intent.
+Three arcs ship today:
+
+- **`ingage`** – 7-8 min lightning talk, delivered.
+- **`gdg`** – ~40 min community talk (`?variant=gdg`), a superset that adds a who-am-I intro, a "Time for a Demo" transition, and a "What I've Learned" beat (components `whoami`, `demo`, `lessons` in `SlideShow.jsx`).
+- **`cincydev-ai`** – ~40 min Cincy.dev AI-Augmented Engineers talk (`?variant=cincydev-ai`), a sibling of `gdg` with **no live demo**. Two beats replace it: a **tooling spectrum** (`spectrum`, rendered twice from one component, the second with `highlight: "speckit"`) and a **stepped artifact walkthrough** (`artifacts`). Content SoT: `src/data/spectrum.js` and `src/data/artifacts.js`.
+
+The slide-by-slide arc, the bridge-bold chain, and the editorial intent behind each beat live in [`docs/speaker-notes.md`](docs/speaker-notes.md) → Slide arc and editorial intent.
+
+### Stepped slides (sub-steps)
+
+Some entries are walked through in place rather than being several slides: the interactive flow (its step nodes) and the artifacts walk (its six stops). That walk lives in [`src/deck/navigation.js`](src/deck/navigation.js), which is the single place declaring which slugs have sub-steps and the only place the arrow-key and URL-hash rules are written. Sub-steps are deep-linkable as `#slug/subStepId` (`#spec-kit-flow/analyze`, `#artifacts/plan`), and a slide with sub-steps receives the cursor as an `activeId` prop. Adding another stepped slide means adding one entry to `SUB_STEPS`, not another branch in `App.jsx`.
 
 ## Interactive flow visual
 
@@ -71,7 +81,7 @@ Per-slide timings, keeper lines not yet in the slides, and What's Next framing g
 ## Vocabulary
 
 - **Spec-Driven Development** – proper noun, always hyphenated and title-cased. Abbreviated **SDD**. Never "spec-driven development", "Spec Driven Development".
-- **constitution**: the governing principles every spec, plan, and task must satisfy. In the talk, frame it as "the guidelines your specs must follow." The constitution vs AGENTS.md comparison was cut from the talk; do not reintroduce it into slides or the flow detail panels.
+- **constitution**: the governing principles every spec, plan, and task must satisfy. In the talk, frame it as "the guidelines your specs must follow." The constitution vs AGENTS.md comparison stays **out of the flow detail panels and out of the `ingage` and `gdg` arcs**, where it cost more than it explained. It appears in exactly one place: the constitution stop of the `cincydev-ai` artifact walk, for a room that already lives in AGENTS.md and needs the distinction. The distinction to draw is enforcement, never format: AGENTS.md is advice an agent may act on, the constitution is gated at `/speckit.plan` and re-checked by `/speckit.analyze`.
 - **checklist vs analyze**: `/checklist` = "unit tests for English" for a single spec's quality; `/analyze` = cross-artifact consistency check across spec + plan + tasks + constitution.
 
 ## Content principles
@@ -81,11 +91,11 @@ Per-slide timings, keeper lines not yet in the slides, and What's Next framing g
 - **Copy voice** (personal author style; see [`docs/copy-style.md`](docs/copy-style.md)). Contractions throughout; interrogative section labels keep a "?", statement labels do not. Banned words: robust, comprehensive, leverage, synergize, productionalized, holistic, scalable solutions, best-in-class.
 - **B-corp tie-in: exactly two touches.** Both live on the Why Should I Care? slide as a "less rework" couplet: (1) people ("less rework → fewer surprise weekends") and (2) planet/profit ("less rework → fewer wasted tokens → lower cost + less energy"). They render via `.sl-annotation`. Do not add more.
 - **Cadence**: one idea per slide; large type; near-zero reading load. Smaller, punchier slides beat dense slides the presenter talks over.
-- **Bold (`<strong>`) has two sanctioned uses.** (1) **Bridge = forward signal:** a slide that introduces the next slide's subject ends on that term bolded. Today: Hook ends on bold **Spec-Driven Development**; SDD slide ends on bold **Spec Kit**. Keep that chain intact when adding or reordering slides. (2) **Standout item in a list:** the single most important entry, at most one per slide. Bold is never used for ordinary in-slide emphasis – that is the orange `.sl-em` (`<em>`) treatment.
+- **Bold (`<strong>`) has two sanctioned uses.** (1) **Bridge = forward signal:** a slide that introduces the next slide's subject ends on that term bolded. Today: Hook ends on bold **Spec-Driven Development**; SDD slide ends on bold **Spec Kit**. Keep that chain intact when adding or reordering slides. The one sanctioned exception: the `cincydev-ai` arc puts the spectrum slide between SDD and "What's Spec Kit?", so it passes `ecosystem: false` to drop the SDD slide's ecosystem line entirely (the spectrum names that landscape properly), and the bridge bold goes with it rather than pointing two slides ahead. If another variant inserts a slide into the chain, do the same. (2) **Standout item in a list:** the single most important entry, at most one per slide. Bold is never used for ordinary in-slide emphasis – that is the orange `.sl-em` (`<em>`) treatment.
 
 ## Install commands (closing slide)
 
-The "Where to start?" slide renders the install one-liner as the light `.sl-install` chip; the rendered SoT is `src/slides/SlideShow.jsx`. Keep it agent-agnostic and unpinned (`uv tool install … specify-cli`, then `specify init`), in sync with the current [Spec Kit README](https://github.com/github/spec-kit).
+The "Where to start?" slide renders the install one-liner as the light `.sl-install` chip; the rendered SoT is `src/slides/SlideShow.jsx`. Keep it harness-agnostic and unpinned (`uv tool install … specify-cli`, then `specify init`), in sync with the current [Spec Kit README](https://github.com/github/spec-kit).
 
 ## Testing and verification
 

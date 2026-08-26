@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import App from "./App.jsx";
 import { isKnownVariant } from "./data/variants.js";
+import { ARTIFACT_IDS } from "./data/artifacts.js";
 
 // Drive resolution by setting the address, then rendering <App/>. Both modes
 // render the shared `.slideshow` stage; the picker is distinguished by its
@@ -51,6 +52,55 @@ describe("App variant resolution", () => {
   it("shows the picker for an unknown variant instead of defaulting", () => {
     const { container } = visit("/?variant=zzz");
     expect(container.querySelector(".picker")).not.toBeNull();
+  });
+});
+
+// The artifacts walk is one manifest entry with six sub-steps, driven by the
+// same arrow keys as the rest of the deck (src/deck/navigation.js). These drive
+// it through the real Deck, so the wiring between the key handler, the hash,
+// and the slide's activeId prop stays honest.
+describe("stepped artifact walk (cincydev-ai)", () => {
+  const arrow = () => fireEvent.keyDown(window, { key: "ArrowRight" });
+
+  it("opens at the overview, with no stop focused", () => {
+    const { container } = visit("/?variant=cincydev-ai#artifacts");
+    expect(container.textContent).toContain("So what does it actually write?");
+    expect(container.querySelectorAll(".sl-steps li[data-on]")).toHaveLength(0);
+  });
+
+  it("advances through every stop, then leaves for the next slide", () => {
+    const { container } = visit("/?variant=cincydev-ai#artifacts");
+
+    // Driven off the data, so adding or removing a stop does not need this
+    // test edited, only re-run.
+    ARTIFACT_IDS.forEach((id) => {
+      arrow();
+      expect(window.location.hash).toBe(`#artifacts/${id}`);
+    });
+    expect(container.textContent).toContain("/speckit.analyze");
+
+    // Past the last stop, the walk runs off the end into the next entry.
+    arrow();
+    expect(window.location.hash).toBe("#why-should-i-care");
+  });
+
+  it("deep-links straight to a stop", () => {
+    const { container } = visit("/?variant=cincydev-ai#artifacts/plan");
+    expect(container.textContent).toContain("The technical design.");
+    expect(container.textContent).toContain("## Constitution Check");
+  });
+
+  it("returns to the overview on Escape without moving the deck", () => {
+    const { container } = visit("/?variant=cincydev-ai#artifacts/tasks");
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(window.location.hash).toBe("#artifacts");
+    expect(container.textContent).toContain("So what does it actually write?");
+  });
+
+  it("steps back out of the walk to the preceding slide", () => {
+    visit("/?variant=cincydev-ai#artifacts");
+    fireEvent.keyDown(window, { key: "ArrowLeft" });
+    expect(window.location.hash).toBe("#spec-kit-flow");
   });
 });
 

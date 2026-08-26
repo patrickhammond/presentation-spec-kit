@@ -39,7 +39,7 @@ Any one of these is a win:
 
 - **Lead with recognition.** The "this is just the SDLC, with executable artifacts" moment is the hook for an SDLC-literate, mildly skeptical crowd. It earns the right to make any payoff claim.
 - **Two doors for the next step.** Developers: run the init. Non-developers: read a real `spec.md` and see it is just a PRD with acceptance criteria. Do not pitch the next step at developers only.
-- **Place it in the ecosystem.** "Understand where it fits" is an explicit goal, so the close names the landscape (Spec Kit / OpenSpec / Kiro) rather than leaving it to Q&A.
+- **Place it in the ecosystem.** "Understand where it fits" is an explicit goal, so the close names the landscape (Spec Kit / OpenSpec, plus plugins like Superpowers, GSD, and Grill Me) rather than leaving it to Q&A.
 - **End on curiosity.** Open questions invite the conversation to continue better than a summary or a "Questions?" slide.
 
 ## Leave-behind design implications

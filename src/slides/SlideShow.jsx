@@ -5,6 +5,41 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Fragment } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import {
+  SPECTRUM_AXES,
+  SPECTRUM_TOOLS,
+  SPECTRUM_ALSO,
+} from "../data/spectrum.js";
+import { ARTIFACTS, ARTIFACT_FEATURE } from "../data/artifacts.js";
+
+// A deliberately tiny inline markup subset for copy that lives in data modules:
+// `backticks` become inline code, *asterisks* become the orange .sl-em accent.
+// Lets src/data/artifacts.js name commands and files, and mark the one phrase
+// that carries a stop, without putting JSX in a data module. Monospace here is
+// code, which is the one use the brand rules allow outside labels and titles.
+const INLINE_MARKUP = /(`[^`]+`|\*[^*]+\*)/g;
+
+function withInline(text) {
+  return String(text)
+    .split(INLINE_MARKUP)
+    .filter(Boolean)
+    .map((part, i) => {
+      const inner = part.slice(1, -1);
+      if (part.startsWith("`"))
+        return (
+          <code className="sl-code" key={i}>
+            {inner}
+          </code>
+        );
+      if (part.startsWith("*"))
+        return (
+          <em className="sl-em" key={i}>
+            {inner}
+          </em>
+        );
+      return <Fragment key={i}>{part}</Fragment>;
+    });
+}
 
 function Label({ n, title }) {
   return (
@@ -137,7 +172,12 @@ function HookSlide({ section }) {
   );
 }
 
-function SddSlide({ section }) {
+// `ecosystem` controls the paragraph that names the wider tooling landscape.
+// That paragraph also carries the bridge bold into "What's Spec Kit?" (see
+// CLAUDE.md content principles), so the two travel together: a variant whose
+// next slide is the tooling spectrum sets it false, because that slide names
+// the landscape in far more detail and the bridge would point past it.
+function SddSlide({ section, ecosystem = true }) {
   return (
     <div className="slide">
       <Label n={section} title="What’s Spec-Driven Development?" />
@@ -151,9 +191,16 @@ function SddSlide({ section }) {
             document that rots in a wiki or far away in an issue tracker.
           </p>
           {/* Bridge bold: foreshadows the next slide (Spec Kit). See CLAUDE.md content principles. */}
+          {ecosystem && (
+            <p className="sl-body">
+              <strong>Spec Kit</strong> is a toolkit for SDD. OpenSpec and
+              others exist too, plus plugins like Superpowers, GSD, and Grill
+              Me.
+            </p>
+          )}
           <p className="sl-body">
-            <strong>Spec Kit</strong> is a toolkit for SDD. OpenSpec, Kiro, and
-            others exist too, plus plugins like Superpowers and Grill Me.
+            {ecosystem ? "Whatever you pick, the" : "Those"} artifacts are{" "}
+            <em className="sl-em">plain Markdown</em> that lives with your code.
           </p>
         </div>
         {/* Vertical (top-to-bottom) to prime the same orientation as the #spec-kit-flow slide */}
@@ -179,15 +226,15 @@ function SpecKitSlide({ section }) {
   return (
     <div className="slide">
       <Label n={section} title="What’s Spec Kit?" />
-      <h1 className="sl-h1">Specs, plans, and tasks, as plain Markdown.</h1>
+      <h1 className="sl-h1">Specs, plans, and tasks, as commands you run.</h1>
       <p className="sl-body">
-        Spec Kit is the toolkit that puts SDD into practice. It’s{" "}
-        <em className="sl-em">agent-agnostic</em>: works with Claude, Copilot,
-        Cursor, and more.
+        Spec Kit is a toolkit that puts SDD into practice. It’s{" "}
+        <em className="sl-em">harness-agnostic</em>: works with Claude Code,
+        Copilot, Cursor, Antigravity, and more.
       </p>
       <p className="sl-body">
-        Artifacts are text files, so your agents read them directly. Versioned
-        with your code, so every decision is traceable.
+        Versioned with your code, so every decision is traceable and available
+        where you’re working.
       </p>
       <div className="sl-spec-wrap">
         <span className="sl-spec-file">spec.md</span>
@@ -217,7 +264,11 @@ function SpecKitSlide({ section }) {
   );
 }
 
-function PredictabilitySlide({ section }) {
+// `leadLines` is optional per-variant copy that lands before the shared body:
+// an arc that has just shown the room something concrete can tie it to the
+// payoff here. Plain strings, rendered through withInline, so the manifest
+// stays a data module.
+function PredictabilitySlide({ section, leadLines = [] }) {
   return (
     <div className="slide">
       <Label n={section} title="Why Should I Care?" />
@@ -226,6 +277,11 @@ function PredictabilitySlide({ section }) {
         <br />
         Fewer surprises at the end.
       </h1>
+      {leadLines.map((line, i) => (
+        <p className="sl-body" key={i}>
+          {withInline(line)}
+        </p>
+      ))}
       <p className="sl-body">
         Let the agent handle the <em className="sl-em">how</em>. You own the{" "}
         <em className="sl-em">what and result</em>.
@@ -248,18 +304,24 @@ function HonestCloseSlide({ section }) {
     <div className="slide">
       <Label n={section} title="What Am I Still Figuring Out?" />
       <h2 className="sl-h2">
-        I’ve walked you through this like I’ve got it figured out. I don’t.
+        I’ve walked you through this like I’ve got it figured out.{" "}
+        <em className="sl-em">I don’t.</em>
       </h2>
       <p className="sl-body">
-        <em className="sl-em">Nothing here is new.</em> What’s new is trusting
-        an agent with it. How that grows and holds up over time, I’m still
-        learning.
+        Nothing here is new. Most of this just makes problems we already had
+        more visible.
       </p>
       <p className="sl-body">Some questions I’m thinking about…</p>
       <ul className="sl-bullets">
-        <li>Are specs living truth, throwaway, or merged into docs?</li>
         <li>When is the SDD ceremony not useful?</li>
-        <li>Who owns specs, and where do they clash with existing tools?</li>
+        <li>
+          Once the code ships, do specs live on, merge into docs, or expire?
+        </li>
+        <li>
+          Which roles own specs, and where do they clash with existing
+          processes?
+        </li>
+        <li>How do you actually work with a thousand specs?</li>
       </ul>
     </div>
   );
@@ -384,30 +446,194 @@ function DemoSlide({ section }) {
   );
 }
 
-// Practitioner "what I've learned" beat: honest lessons that stuck. Distinct
-// from the open questions on the next slide. One bolded standout.
+// Practitioner "what I've learned" beat: what running these tools has actually
+// taught the speaker. Distinct from the open questions on the next slide, which
+// are the things still unresolved. One bolded standout.
 function LessonsSlide({ section }) {
   return (
     <div className="slide">
       <Label n={section} title="What I’ve Learned" />
-      <h1 className="sl-h1">A few things that actually stuck.</h1>
+      {/* A fragment on purpose: the heading runs straight into the list. */}
+      <h1 className="sl-h1">Using these tools…</h1>
       <ul className="sl-bullets">
+        <li>I catch more “bugs” in spec review than code review now.</li>
         <li>
-          I catch more bugs in <em className="sl-em">spec review</em> than code
-          review now.
+          The more specs I have, and the more they reference each other, the
+          more obvious drift becomes. It usually surfaces during{" "}
+          <code className="sl-code">plan</code>,{" "}
+          <code className="sl-code">tasks</code>, or{" "}
+          <code className="sl-code">analyze</code>, but still sometimes not
+          until <code className="sl-code">implement</code>.
         </li>
         <li>
-          The methodology isn’t new. The <em className="sl-em">discipline</em>{" "}
-          of actually following it is what gets me the results I want.
+          The optional commands, <code className="sl-code">clarify</code> and{" "}
+          <code className="sl-code">analyze</code>, drastically improve spec
+          artifact quality and final output.
         </li>
         <li>
-          The optional commands, clarify and analyze, are where the quality
-          hides.
-        </li>
-        <li>
-          <strong>Small, sharp specs beat big ones the agent skims.</strong>
+          <strong>
+            Creating small, minimally scoped specs keeps the work focused and
+            keeps the agent from wandering, no different from scoping it well
+            for a person.
+          </strong>
         </li>
       </ul>
+    </div>
+  );
+}
+
+// Tooling spectrum: ceremony up front vs churn later, with the four tools the
+// room already knows plotted on it. `highlight` lights one marker and its
+// legend row; no arc uses it today (the cincydev-ai callback showing was cut in
+// favour of a line on Why Should I Care?), but it is what makes a second,
+// earned showing cheap if one is ever wanted again. Coordinates and
+// copy come from src/data/spectrum.js; the plot is HTML positioned by --x/--y
+// custom properties so every label stays real, vmin-scaled text.
+function SpectrumSlide({
+  section,
+  title = "Where Does This Fit?",
+  heading,
+  lines = [],
+  highlight = null,
+}) {
+  const order = SPECTRUM_TOOLS.map((t) => t.name).join(", then ");
+  return (
+    <div className="slide slide--wide">
+      <Label n={section} title={title} />
+      <h1 className="sl-h1">{heading}</h1>
+      <div className="sl-spectrum">
+        <div
+          className="sl-plot"
+          role="img"
+          aria-label={`Scatter plot. Horizontal axis: ${SPECTRUM_AXES.x.label}, light to heavy. Vertical axis: ${SPECTRUM_AXES.y.label}, low to high. Plotted on a descending diagonal: ${order}.`}
+        >
+          <span className="sl-plot-axis sl-plot-axis--y" aria-hidden="true">
+            {SPECTRUM_AXES.y.label}
+          </span>
+          <span className="sl-plot-cap sl-plot-cap--top" aria-hidden="true">
+            {SPECTRUM_AXES.y.high}
+          </span>
+          <span className="sl-plot-cap sl-plot-cap--bottom" aria-hidden="true">
+            {SPECTRUM_AXES.y.low}
+          </span>
+          <span className="sl-plot-axis sl-plot-axis--x" aria-hidden="true">
+            {SPECTRUM_AXES.x.label}
+          </span>
+          <span className="sl-plot-cap sl-plot-cap--left" aria-hidden="true">
+            {SPECTRUM_AXES.x.low}
+          </span>
+          <span className="sl-plot-cap sl-plot-cap--right" aria-hidden="true">
+            {SPECTRUM_AXES.x.high}
+          </span>
+          <span className="sl-plot-trend" aria-hidden="true" />
+          {SPECTRUM_TOOLS.map((tool) => (
+            <span
+              key={tool.id}
+              className="sl-plot-dot"
+              style={{ "--x": tool.x, "--y": tool.y }}
+              data-on={tool.id === highlight || undefined}
+              data-flip={tool.x > 0.55 || undefined}
+              aria-hidden="true"
+            >
+              <span className="sl-plot-name">{tool.name}</span>
+            </span>
+          ))}
+        </div>
+        <ul className="sl-plot-legend">
+          {SPECTRUM_TOOLS.map((tool) => (
+            <li key={tool.id} data-on={tool.id === highlight || undefined}>
+              <span className="sl-plot-legend-name">{tool.name}</span>
+              <span className="sl-plot-legend-when">{tool.when}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p className="sl-plot-also">{SPECTRUM_ALSO}</p>
+      {lines.map((line, i) => (
+        <p className="sl-body" key={i}>
+          {line}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+// Stepped walkthrough of what Spec Kit actually generates. `activeId` is the
+// deck's sub-step cursor (see src/deck/navigation.js): null shows the overview
+// map, and each artifact id shows that stop. Content is the real output for
+// this repo's own outline modal feature, from src/data/artifacts.js. The
+// treatment is structure over prose on purpose: section headings stay readable
+// from the back of the room where a wall of Markdown would not.
+function ArtifactsSlide({ section, activeId = null }) {
+  const stop = ARTIFACTS.find((a) => a.id === activeId) || null;
+  const tab = stop && (stop.files[0] || "report (never written to disk)");
+
+  return (
+    <div className="slide slide--wide">
+      <Label n={section} title="What Gets Generated?" />
+      <ol className="sl-steps">
+        {ARTIFACTS.map((a) => (
+          <li key={a.id} data-on={a.id === activeId || undefined}>
+            {a.cmd.replace("/speckit.", "")}
+          </li>
+        ))}
+      </ol>
+
+      <div className="sl-artifact-body">
+        {!stop ? (
+          <>
+            <h1 className="sl-h1">So what does it actually write?</h1>
+            <p className="sl-body">
+              Every artifact ahead is real output from one feature of{" "}
+              <em className="sl-em">this deck</em>: the {ARTIFACT_FEATURE.name}.
+              It all lives in{" "}
+              <code className="sl-code">{ARTIFACT_FEATURE.dir}</code> in the
+              repo you can clone at the end.
+            </p>
+            <p className="sl-body">
+              Six commands, six different kinds of artifacts. Watch what each
+              one is actually for.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className="sl-h1">{stop.title}</h1>
+            <div className="sl-split">
+              <div className="sl-split-main">
+                <div className="sl-spec-wrap">
+                  <span className="sl-spec-file sl-spec-file--lg">{tab}</span>
+                  <div className="sl-spec sl-shape">
+                    {stop.shape.map((heading) => (
+                      <span className="sl-shape-line" key={heading}>
+                        {heading}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                {stop.files.length > 1 && (
+                  <p className="sl-artifact-also">
+                    <span>Alongside it:</span>
+                    {stop.files.slice(1).map((f) => (
+                      <code className="sl-code" key={f}>
+                        {f}
+                      </code>
+                    ))}
+                  </p>
+                )}
+              </div>
+              <div className="sl-split-aside sl-split-aside--stack">
+                <p className="sl-artifact-cmd">{stop.cmd}</p>
+                <blockquote className="sl-pull">{stop.pull}</blockquote>
+                {stop.callout.map((para, i) => (
+                  <p className="sl-body" key={i}>
+                    {withInline(para)}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -425,6 +651,8 @@ export const SLIDE_REGISTRY = {
   hook: HookSlide,
   sdd: SddSlide,
   specKit: SpecKitSlide,
+  spectrum: SpectrumSlide,
+  artifacts: ArtifactsSlide,
   demo: DemoSlide,
   why: PredictabilitySlide,
   lessons: LessonsSlide,
