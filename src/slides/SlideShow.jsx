@@ -182,7 +182,7 @@ function SddSlide({ section, ecosystem = true }) {
       <Label n={section} title="What’s Spec-Driven Development?" />
       <div className="sl-split">
         <div className="sl-split-main">
-          <h1 className="sl-h1">It’s the workflow you already do.</h1>
+          <h1 className="sl-h1">Spoiler: It’s already your workflow.</h1>
           <p className="sl-body">
             Spec-Driven Development (SDD) is just that. The difference: each
             artifact becomes an{" "}

@@ -45,7 +45,7 @@ describe("App variant resolution", () => {
     expect(container.querySelector(".picker")).toBeNull();
     // #whats-sdd resolves to the SDD slide, proving deep-linking still works
     expect(container.textContent).toContain(
-      "It’s the workflow you already do.",
+      "Spoiler: It’s already your workflow.",
     );
   });
 
