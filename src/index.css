@@ -1403,3 +1403,302 @@ kbd {
   flex-shrink: 0;
   letter-spacing: 0.04em;
 }
+
+/* ── Tooling spectrum (cincydev-ai) ───────────────────────────────────────── */
+/*    Ceremony (x) vs churn (y), 0-1 cartesian coordinates from
+      src/data/spectrum.js, origin bottom-left. Markers are real HTML text
+      positioned by --x/--y custom properties, so labels inherit the vmin type
+      scale and the projector minimums instead of being baked into an SVG.
+      Every label here is held to the ≥ 2vmin floor in docs/accessibility.md. */
+.sl-spectrum {
+  display: grid;
+  /* The plot carries the longest labels (a marker name sits beside its dot), so
+     it gets the wider column; the legend wraps comfortably in what is left. */
+  grid-template-columns: 1.35fr 1fr;
+  gap: clamp(20px, 3.2vmin, 44px);
+  align-items: center;
+  width: 100%;
+}
+
+.sl-plot {
+  position: relative;
+  /* Wider than tall: marker labels run horizontally, so width is the scarce
+     dimension, not height. */
+  aspect-ratio: 3 / 2;
+  /* Axis labels sit in this margin, outside the frame, so they can never
+     collide with a marker parked in a corner. em-based off the plot's own
+     font size, which is also the axis/cap size. */
+  font-size: clamp(15px, 2.1vmin, 26px);
+  margin: 0.4em 0.4em 3.4em 3.2em;
+  background: #ffffff;
+  border: 1px solid #d4cfc9;
+  border-left: 3px solid #20282d;
+  border-bottom: 3px solid #20282d;
+  border-radius: 0 8px 8px 0;
+}
+
+.sl-plot-axis,
+.sl-plot-cap {
+  position: absolute;
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #404850; /* ≈ 8.9:1 on Warm White */
+}
+.sl-plot-axis {
+  font-size: 1em;
+  font-weight: 500;
+  color: #20282d;
+}
+.sl-plot-cap {
+  /* Same size as the axis label: hierarchy comes from weight and colour, not
+     from shrinking past the projector floor (docs/accessibility.md). */
+  font-size: 1em;
+  font-weight: 400;
+}
+.sl-plot-axis--x {
+  bottom: -2.9em;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sl-plot-axis--y {
+  left: -1.4em;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+.sl-plot-cap--left {
+  bottom: -1.5em;
+  left: 0;
+}
+.sl-plot-cap--right {
+  bottom: -1.5em;
+  right: 0;
+}
+.sl-plot-cap--top {
+  top: 0;
+  right: calc(100% + 0.5em);
+}
+.sl-plot-cap--bottom {
+  bottom: 0;
+  right: calc(100% + 0.5em);
+}
+
+/* The trade line the markers sit on. Drawn, not implied: the diagonal is the
+   argument of the slide, so it is stated rather than left to the eye. */
+.sl-plot-trend {
+  position: absolute;
+  inset: 8% 10%;
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 1px),
+    #e2dcd4 calc(50% - 1px),
+    #e2dcd4 calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+}
+
+.sl-plot-dot {
+  position: absolute;
+  --dot-size: clamp(10px, 1.5vmin, 18px);
+  /* --x / --y are 0-1; the inset keeps corner markers off the frame edge. */
+  left: calc(10% + var(--x) * 80%);
+  bottom: calc(8% + var(--y) * 84%);
+  /* The point is the dot's centre. Translating by -50% would centre the whole
+     marker, label included, and push a left-edge dot outside the frame. */
+  transform: translate(calc(var(--dot-size) / -2), 50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  white-space: nowrap;
+}
+.sl-plot-dot::before {
+  content: "";
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #4a525b;
+  flex-shrink: 0;
+}
+/* Markers on the right half would run their label off the frame, so they carry
+   it on the left instead (data-flip is set from the coordinate, in the slide). */
+.sl-plot-dot[data-flip] {
+  flex-direction: row-reverse;
+  transform: translate(calc(-100% + var(--dot-size) / 2), 50%);
+}
+.sl-plot-name {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(16px, 2.2vmin, 28px);
+  font-weight: 600;
+  color: #20282d;
+}
+/* Highlighted point: the callback showing, after the artifact walk. */
+.sl-plot-dot[data-on]::before {
+  background: #ee6823;
+  border-color: #ee6823;
+  box-shadow: 0 0 0 clamp(4px, 0.7vmin, 9px)
+    color-mix(in srgb, #ee6823 22%, transparent);
+}
+.sl-plot-dot[data-on] .sl-plot-name {
+  color: #b8410c; /* ≈ 5.4:1 on white; the orange accent needs its dark shade for text */
+}
+
+.sl-plot-legend {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vmin, 22px);
+}
+.sl-plot-legend li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  border-left: 3px solid #e2dcd4;
+  padding-left: 1.4vmin;
+}
+.sl-plot-legend li[data-on] {
+  border-left-color: #ee6823;
+}
+.sl-plot-legend-name {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(16px, 2.3vmin, 29px);
+  font-weight: 600;
+  color: #20282d;
+}
+.sl-plot-legend-when {
+  font-size: clamp(15px, 2.1vmin, 26px);
+  line-height: 1.4;
+  color: #404850;
+}
+
+/* The six stops have very different content heights (a four-heading checklist
+   vs an eleven-heading spec), and .slide-anim centres the slide block, so
+   without a floor here the heading and stepper visibly jump every time the
+   presenter arrows to the next stop. Reserving the tallest stop's height keeps
+   everything above the fold fixed for the whole walk. The a11y suite asserts
+   the heading lands at the same position on every stop, so this value cannot
+   silently fall out of date when the content changes. */
+.sl-artifact-body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vmin, 28px);
+  min-height: 65vmin;
+}
+
+/* Tools named in the landscape but not plotted, so the chart stays readable
+   while the list stays honest. Sits under the plot, above the body copy. */
+.sl-plot-also {
+  font-size: clamp(15px, 2.1vmin, 26px);
+  line-height: 1.45;
+  color: #404850; /* ≈ 8.9:1 on Warm White */
+}
+
+/* ── Artifact walkthrough (cincydev-ai) ───────────────────────────────────── */
+/*    Stepper across the top, then either the overview or one stop. The stops
+      are sub-steps of one deck entry (src/deck/navigation.js). */
+.sl-steps {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5vmin;
+}
+.sl-steps li {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(15px, 2.1vmin, 26px);
+  color: #4a525b; /* ≈ 7.4:1 on Warm White */
+  background: #f4efe9;
+  border: 1px solid #d4cfc9;
+  border-radius: 999px;
+  padding: 0.15em 0.8em;
+  line-height: 1.5;
+}
+.sl-steps li[data-on] {
+  color: #ffffff;
+  background: #b8410c; /* ≈ 5.4:1 against white text */
+  border-color: #b8410c;
+}
+
+/* Both columns of an artifact stop hang from the top: the file card and the
+   notes beside it are different heights on every stop, and centring them made
+   each one float to its own baseline. */
+.sl-artifact-body .sl-split {
+  align-items: start;
+}
+
+.sl-split-aside--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: clamp(12px, 1.8vmin, 26px);
+}
+
+.sl-artifact-cmd {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(16px, 2.3vmin, 29px);
+  font-weight: 500;
+  color: #b8410c;
+  letter-spacing: 0.02em;
+}
+
+/* The artifact card's filename tab is reading content on this slide (it names
+   the file being shown), not the decorative chip it is on the Spec Kit slide,
+   so it steps up to the projector floor. */
+.sl-spec-file--lg {
+  font-size: clamp(15px, 2.1vmin, 26px);
+  color: #4a525b; /* ≈ 7.4:1 on the tab background */
+}
+
+/* Structure, not prose: the artifact's real section headings, stacked. Held to
+   the reading floor, unlike the illustrative .sl-spec code card it reuses. */
+.sl-shape {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  white-space: normal;
+  font-size: clamp(15px, 2.1vmin, 26px);
+  line-height: 1.45;
+}
+.sl-shape-line {
+  /* Consecutive "#" glyphs run together in IBM Plex Mono at this size, which
+     blurs the heading level the room is meant to read. */
+  letter-spacing: 0.04em;
+  color: #554993; /* matches the .tok-sec heading colour on the spec card */
+  font-weight: 500;
+}
+
+/* One verbatim line pulled out of the artifact. */
+.sl-pull {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(15px, 2.1vmin, 26px);
+  line-height: 1.5;
+  color: #20282d;
+  background: #f4efe9;
+  border-left: 3px solid #ee6823;
+  border-radius: 0 6px 6px 0;
+  padding: 0.8vmin 1.2vmin;
+}
+
+/* The extra files a single command drags along with its primary artifact.
+   Chips in a wrapping row rather than a comma-separated sentence: the chip
+   padding leaves punctuation stranded. */
+.sl-artifact-also {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4em;
+  font-size: clamp(15px, 2.1vmin, 26px);
+  line-height: 1.5;
+  color: #404850;
+  margin-top: 0.6vmin;
+}
+
+.sl-code {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.95em;
+  color: #20282d;
+  background: #f2ede8;
+  border: 1px solid #e2dcd4;
+  border-radius: 4px;
+  padding: 0.05em 0.35em;
+}

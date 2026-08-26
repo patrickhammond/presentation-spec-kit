@@ -2,11 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import SpecKitFlow from "./flow/SpecKitFlow.jsx";
 import { SLIDE_REGISTRY } from "./slides/SlideShow.jsx";
 import { VARIANTS, isKnownVariant } from "./data/variants.js";
-import { STEP_IDS } from "./data/steps.js";
 import VariantPicker from "./picker/VariantPicker.jsx";
 import OutlineModal from "./outline/OutlineModal.jsx";
-
-const FLOW_SLUG = "spec-kit-flow";
+import {
+  subStepsFor,
+  parseDeckHash,
+  deckHash,
+  advance,
+  retreat,
+  resetSubStep,
+} from "./deck/navigation.js";
 
 // The active variant resolved from the URL: a known ?variant= key, else null
 // (which means "show the picker"). An unknown key resolves to null too, so a bad
@@ -60,7 +65,6 @@ export default function App() {
 
 function Deck({ variantKey, onExit }) {
   const entries = VARIANTS[variantKey].entries;
-  const flowIndex = entries.findIndex((e) => e.type === "flow");
 
   // The "Pick a talk" switcher shows only when there is no ?variant= query param.
   // Both direct links and picker selections stamp the param, so in normal use the
@@ -77,37 +81,18 @@ function Deck({ variantKey, onExit }) {
   //   #whats-the-problem, #whats-sdd… -> that slide, by slug
   //   #spec-kit-flow                  -> interactive flow, overview
   //   #spec-kit-flow/analyze          -> interactive flow, focused on a step node
-  // entries is stable for the session (fixed variant), so these are memoized and
-  // can be honest effect dependencies without re-running on every render.
-  const parseHash = useCallback(() => {
-    const raw = window.location.hash.replace(/^#\/?/, "");
-    if (!raw) return { index: 0, activeId: null };
-    // Flow hashes only resolve if this variant actually has a flow entry;
-    // otherwise fall through to the slug lookup (which lands on the title).
-    if (flowIndex !== -1) {
-      if (raw === FLOW_SLUG) return { index: flowIndex, activeId: null };
-      if (raw.startsWith(`${FLOW_SLUG}/`)) {
-        const id = raw.slice(FLOW_SLUG.length + 1);
-        return {
-          index: flowIndex,
-          activeId: STEP_IDS.includes(id) ? id : null,
-        };
-      }
-    }
-    const idx = entries.findIndex((e) => e.slug === raw);
-    return idx === -1
-      ? { index: 0, activeId: null }
-      : { index: idx, activeId: null };
-  }, [entries, flowIndex]);
+  //   #artifacts/plan                 -> artifact walk, focused on a stop
+  // The parsing, serializing, and stepping rules live in ./deck/navigation.js so
+  // they can be unit tested without rendering the flow canvas. entries is stable
+  // for the session (fixed variant), so these are memoized and can be honest
+  // effect dependencies without re-running on every render.
+  const parseHash = useCallback(
+    () => parseDeckHash(entries, window.location.hash),
+    [entries],
+  );
 
   const locationToHash = useCallback(
-    (index, activeId) => {
-      const entry = entries[index];
-      if (!entry) return "";
-      if (entry.type === "flow")
-        return activeId ? `#${FLOW_SLUG}/${activeId}` : `#${FLOW_SLUG}`;
-      return `#${entry.slug}`;
-    },
+    (index, activeId) => deckHash(entries, index, activeId),
     [entries],
   );
 
@@ -118,6 +103,7 @@ function Deck({ variantKey, onExit }) {
 
   const entry = entries[index];
   const inFlow = entry?.type === "flow";
+  const subSteps = subStepsFor(entry);
 
   function navigateTo(target) {
     setActiveId(null);
@@ -155,50 +141,31 @@ function Deck({ variantKey, onExit }) {
         e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ";
       const back = e.key === "ArrowLeft" || e.key === "ArrowUp";
 
-      if (inFlow) {
-        if (e.key === "Escape" || e.key === "Home") {
-          // Esc/Home returns the flow to its overview (per CLAUDE.md interaction
-          // model). It never advances the deck, so pressing Esc to leave
-          // fullscreen does not also jump slides. To exit the flow, arrow back.
-          e.preventDefault();
-          setActiveId(null);
-          return;
-        }
-        const idx = activeId ? STEP_IDS.indexOf(activeId) : -1;
-        if (forward) {
-          e.preventDefault();
-          if (idx >= STEP_IDS.length - 1) {
-            // Past the last node: leave the flow forward.
-            setActiveId(null);
-            setIndex((i) => Math.min(i + 1, entries.length - 1));
-          } else {
-            setActiveId(STEP_IDS[idx + 1]);
-          }
-        } else if (back) {
-          e.preventDefault();
-          if (activeId !== null) {
-            if (idx <= 0) setActiveId(null);
-            else setActiveId(STEP_IDS[idx - 1]);
-          } else {
-            // Overview, going back: leave the flow backward.
-            setIndex((i) => Math.max(i - 1, 0));
-          }
-        }
-      } else {
-        if (forward) {
-          e.preventDefault();
-          setActiveId(null);
-          setIndex((i) => Math.min(i + 1, entries.length - 1));
-        } else if (back) {
-          e.preventDefault();
-          setActiveId(null);
-          setIndex((i) => Math.max(i - 1, 0));
-        }
+      // Esc/Home returns an entry with sub-steps to its overview (per CLAUDE.md
+      // interaction model). It never advances the deck, so pressing Esc to leave
+      // fullscreen does not also jump slides. To exit the entry, arrow back.
+      if (subSteps && (e.key === "Escape" || e.key === "Home")) {
+        e.preventDefault();
+        applyMove(resetSubStep);
+        return;
       }
+      if (!forward && !back) return;
+
+      e.preventDefault();
+      applyMove(forward ? advance : retreat);
     }
+
+    // The step functions are pure over the whole location, so both pieces of
+    // state are set from one computed result rather than nudged independently.
+    function applyMove(move) {
+      const next = move(entries, { index, activeId });
+      setIndex(next.index);
+      setActiveId(next.activeId);
+    }
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [inFlow, activeId, entries.length, outlineOpen]);
+  }, [entries, index, activeId, subSteps, outlineOpen]);
 
   // Reflect the current location in the URL hash. replaceState keeps the URL
   // shareable without pushing a history entry for every step, and preserves the
@@ -271,9 +238,16 @@ function Deck({ variantKey, onExit }) {
           <div key={index} className="slide-anim">
             {(() => {
               const Slide = SLIDE_REGISTRY[entry.id];
-              return Slide ? (
-                <Slide section={entry.section} {...(entry.props || {})} />
-              ) : null;
+              if (!Slide) return null;
+              // Only slides that declare sub-steps are handed the cursor; the
+              // rest keep a props signature of section + manifest props.
+              return (
+                <Slide
+                  section={entry.section}
+                  {...(subSteps ? { activeId } : {})}
+                  {...(entry.props || {})}
+                />
+              );
             })()}
           </div>
         )}

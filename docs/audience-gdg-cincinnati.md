@@ -33,7 +33,7 @@ Any one of these is a win:
 - People are curious to keep exploring Spec Kit and adjacent AI techniques.
 - People who have never tried it take a first step.
 - People who already use it pick up at least one new idea (a command, a loop, a habit).
-- People can place Spec Kit in the wider ecosystem (Spec Kit / OpenSpec / Kiro).
+- People can place Spec Kit in the wider ecosystem (Spec Kit / OpenSpec, plus plugins like Superpowers, GSD, and Grill Me).
 
 ## What this implies for the content
 
