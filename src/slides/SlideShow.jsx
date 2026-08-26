@@ -532,6 +532,7 @@ function SpectrumSlide({
               style={{ "--x": tool.x, "--y": tool.y }}
               data-on={tool.id === highlight || undefined}
               data-flip={tool.x > 0.55 || undefined}
+              data-baseline={tool.baseline || undefined}
               aria-hidden="true"
             >
               <span className="sl-plot-name">{tool.name}</span>
@@ -540,7 +541,11 @@ function SpectrumSlide({
         </div>
         <ul className="sl-plot-legend">
           {SPECTRUM_TOOLS.map((tool) => (
-            <li key={tool.id} data-on={tool.id === highlight || undefined}>
+            <li
+              key={tool.id}
+              data-on={tool.id === highlight || undefined}
+              data-baseline={tool.baseline || undefined}
+            >
               <span className="sl-plot-legend-name">{tool.name}</span>
               <span className="sl-plot-legend-when">{tool.when}</span>
             </li>

@@ -1544,6 +1544,33 @@ kbd {
   color: #b8410c; /* ≈ 5.4:1 on white; the orange accent needs its dark shade for text */
 }
 
+/* The baseline point (src/data/spectrum.js): ceremony zero, nothing written
+   down. A lighter grey on both the marker and its legend row so it reads as a
+   different kind of thing, not a fourth flavour of the same thing. #68727b is
+   the lightest grey that still clears 4.5:1 on white (docs/accessibility.md),
+   so the de-emphasis never costs legibility from the back of the room. */
+.sl-plot-dot[data-baseline]::before {
+  border-color: #a8b0b8;
+}
+.sl-plot-dot[data-baseline] .sl-plot-name {
+  color: #68727b; /* ≈ 4.9:1 on white */
+}
+.sl-plot-legend li[data-baseline] {
+  border-left-color: #ebe6e0;
+}
+.sl-plot-legend li[data-baseline] .sl-plot-legend-name,
+.sl-plot-legend li[data-baseline] .sl-plot-legend-when {
+  color: #68727b;
+}
+/* A highlight always wins over the baseline shade: if an arc ever lights this
+   marker, it should light fully rather than land in a muted half-state. */
+.sl-plot-dot[data-baseline][data-on]::before {
+  border-color: #ee6823;
+}
+.sl-plot-dot[data-baseline][data-on] .sl-plot-name {
+  color: #b8410c;
+}
+
 .sl-plot-legend {
   list-style: none;
   display: flex;

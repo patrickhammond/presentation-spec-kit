@@ -32,6 +32,12 @@ export const SPECTRUM_TOOLS = [
     x: 0.08,
     y: 0.9,
     when: "When the change is small enough to hold in your head.",
+    // The zero point of the ceremony axis: nothing is written down, so this is
+    // the baseline the other three are measured against rather than a fourth
+    // flavour of SDD. Rendered in a lighter grey (data-baseline) to read as a
+    // different kind of thing without demoting it: the slide's thesis is a
+    // trade, not a ranking, so it stays on the chart.
+    baseline: true,
   },
   {
     id: "superpowers",
