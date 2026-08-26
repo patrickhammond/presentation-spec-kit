@@ -261,9 +261,9 @@ const cincydevAiArc = withSections([
     props: {
       title: "Where Does This Fit?",
       heading: "There isn’t a winner. There’s a trade.",
-      lines: [
-        "More ceremony up front buys less churn later. You pay either way, just at different times. So the question isn’t which tool is best. It’s whether the ceremony matches how complicated the problem actually is.",
-      ],
+      // No body copy on purpose: the heading states the thesis and the chart
+      // shows it, so the paragraph under it was read-aloud material the
+      // presenter says better than the slide does.
     },
   },
   specKit,
